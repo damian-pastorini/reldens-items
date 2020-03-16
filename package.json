@@ -1,0 +1,59 @@
+{
+    "name": "reldens-items-system",
+    "version": "0.1.0",
+    "description": "Reldens - Items System",
+    "source": true,
+    "homepage": "https://github.com/damian-pastorini/reldens-items",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/damian-pastorini/reldens-items.git"
+    },
+    "keywords": [
+        "reldens",
+        "items",
+        "system",
+        "item",
+        "game",
+        "mmorpg",
+        "rpg",
+        "dwd",
+        "colyseus",
+        "phaser",
+        "parcel",
+        "nodejs",
+        "mmo",
+        "multiplayer",
+        "rol",
+        "platform",
+        "framework"
+    ],
+    "bugs": {
+        "url": "https://github.com/damian-pastorini/reldens-items/issues"
+    },
+    "scripts": {
+        "build-client": "parcel build client.js"
+    },
+    "engines": {
+        "node": "13.1.0"
+    },
+    "author": "Damian A. Pastorini",
+    "license": "MIT",
+    "dependencies": {
+        "await-event-emitter": "^1.2.0",
+        "dotenv": "^8.2.0",
+        "parcel-bundler": "^1.12.4"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.8.4",
+        "@babel/runtime-corejs3": "^7.8.4",
+        "@babel/plugin-transform-runtime": "^7.8.3",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "eslint": "^6.8.0",
+        "eslint-config-standard": "^14.1.0",
+        "eslint-plugin-import": "^2.20.1",
+        "eslint-plugin-node": "^10.0.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "babel-eslint": "^10.0.3"
+    }
+}

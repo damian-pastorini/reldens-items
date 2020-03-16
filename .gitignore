@@ -1,0 +1,9 @@
+/.cache
+/.env
+/.idea
+/node_modules
+/npm-debug*
+/test
+/ts-node*
+/v8-compile-cache*
+/dev
