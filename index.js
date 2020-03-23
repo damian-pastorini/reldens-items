@@ -12,4 +12,6 @@ module.exports = {
     ItemBase: require('./lib/item/type/item'),
     ItemEquipment: require('./lib/item/type/equipment'),
     ItemUsable: require('./lib/item/type/usable'),
+    Modifier: require('./lib/item/modifier'),
+    ItemsConst: require('./lib/constants')
 };

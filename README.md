@@ -2,7 +2,7 @@
 
 # Reldens - Items System
 
-### About
+## About
 
 They idea behind this project is to cover the basics on how an inventory system work.
 Using this package you will get the basic set of features and some more advance, for example, some basic features will be:
@@ -24,6 +24,88 @@ And then you will get other more advanced features like:
 With the package I'll be including an SQL driver using Objection (since this is basically for the Reldens project, but ideally open for others), and a default client integrated with Colyseus.
   
 @TODO: finish documentation.
+
+## How to?
+
+First install using npm: `npm install @reldens/items`
+
+Once you have it you need to create an instance of the InventoryManager or the InventoryServer.
+
+What's the difference?
+
+- ItemsManager is the base set of features agnostic of the rest of the environment, you can instance the manager while working on a node project on the server side (use it as authority), or you can instance the manager for a single player game on the browser.
+
+- ItemsServer is oriented to the server side, it includes the classes to connect with a database, and where you could set a client to send the inventory interactions.
+
+In any case you will need to require and then instance the class by passing an "owner" to the constructor.
+
+For the examples I'll use the server ItemsServer, since it's the more complex one and it includes the ItemsManager, and as owner I'll use a simple object with some properties.
+
+```
+let playerA = {
+    stats: {
+        maxHp: 100,
+        maxMp: 100,
+        atk: 100,
+        def: 100
+    }
+    // these are the current HP and MP:
+    hp: 50
+    mp: 87
+}
+
+let playerB = {
+    stats: {
+        maxHp: 100,
+        maxMp: 100,
+        atk: 100,
+        def: 100
+    }
+    // these are the current HP and MP:
+    hp: 35
+    mp: 80
+}
+
+const { ItemsServer } = require('@reldens/items');
+
+let itemsServer = new ItemsServer(player);
+```
+
+And now you can start playing with Items! Let's create one!
+
+Create an item is as simple as create an instance of the Item class and that's it, but make do something is more complex, so to put some logic available here let's use the "modifiers".
+
+What's a "modifier"??? Basically is an specification on "what the item will do" when is used, that said, thought the modifiers are available you could still not use them and create your item with a custom behavior.
+
+A modifier must have 4 required parameters, let's create an example one:
+```
+const { Modifier, ItemsConst } = require('@reldens/items');
+let itemMod = {key: 'health', 'hp', ItemsConst.OPS.INC, 20};
+```
+And then we add it to the item which we will create below:
+```
+const { ItemUsable } = require('@reldens/items');
+let healthItem = new ItemUsable({
+    key: 'health-restore',
+    manager: itemServer.manager, // from the example above
+    qty: 1,
+    // uses: 1, // by default this is 1 already, just showing it can be specified here.
+    modifiers: {health: itemMod}
+});
+```
+Now we can append the item to the player inventory:
+```
+itemServer.manager.addItem(healthItem);
+```
+And we can use the item (in the case of ItemUsable we can specify the target as show below):
+```
+itemServer.manager.items['health-restore'].use(playerB);
+```
+
+That's it! The item will apply the created modifier and restore 20 HP's on the owner.hp property.
+
+I'll include more examples and how to create / use other items like equipment, and also include some exchange items feature.
+
 
 ### [Reldens](https://github.com/damian-pastorini/reldens/ "Reldens")
 
