@@ -73,16 +73,18 @@ let itemsServer = new ItemsServer(player);
 
 And now you can start playing with Items! Let's create one!
 
+#### - Usable Items
+
 Create an item is as simple as create an instance of the Item class and that's it, but make do something is more complex, so to put some logic available here let's use the "modifiers".
 
 What's a "modifier"??? Basically is an specification on "what the item will do" when is used, that said, thought the modifiers are available you could still not use them and create your item with a custom behavior.
 
-A modifier must have 4 required parameters, let's create an example one:
+- A modifier must have 4 required parameters, let's create an example one:
 ```
 const { Modifier, ItemsConst } = require('@reldens/items');
 let itemMod = {key: 'health', 'hp', ItemsConst.OPS.INC, 20};
 ```
-And then we add it to the item which we will create below:
+- And then we add it to the item which we will create below:
 ```
 const { ItemUsable } = require('@reldens/items');
 let healthItem = new ItemUsable({
@@ -93,18 +95,87 @@ let healthItem = new ItemUsable({
     modifiers: {health: itemMod}
 });
 ```
-Now we can append the item to the player inventory:
+- Now we can append the item to the player inventory:
 ```
 itemServer.manager.addItem(healthItem);
 ```
-And we can use the item (in the case of ItemUsable we can specify the target as show below):
+- And we can use the item (in the case of ItemUsable we can specify the target as show below):
 ```
 itemServer.manager.items['health-restore'].use(playerB);
 ```
 
 That's it! The item will apply the created modifier and restore 20 HP's on the owner.hp property.
 
-I'll include more examples and how to create / use other items like equipment, and also include some exchange items feature.
+#### - Equipment Items
+
+In order to equip an equipment item, you need to use a modifier for an specific owner property, and use the method SET.
+
+For example:
+
+- Your Player class could have a set of properties where you can specify the current equipment.
+```
+let player.equipSet = {
+    weapon: false,
+    shield: false,
+    armor: false,
+    boots: false
+};
+```
+- Then you will have an item with two modifiers on for the property 'equipSet/weapon' and other for the atk increase:
+```
+const { Equipment, Modifier, ItemsConst } = require('@reldens/items');
+let setSword = new Modifier({
+    key: 'sword-equip',
+    propertyKey: 'equipSet/weapon',
+    operation: ItemsConst.OPS.SET,
+    value: 'sword'
+});
+let modifyAtk = new Modifier({
+    key: 'sword-atk',
+    propertyKey: 'atk',
+    operation: ItemsConst.OPS.INC,
+    value: 200 // this would be the atk points increase
+});
+let swordItem = new Equipment({
+    key: 'sword',
+    manager: itemServer.manager,
+    qty: 1,
+    modifiers: {'sword-equip': setSword, 'sword-atk': modifyAtk}
+});
+```
+- For last, you add the equip to the manager and equip the item:
+```
+itemsServer.manager.addItem(swordItem);
+itemsServer.manager.items['sword'].equip();
+```
+- Let say you need to create a second item, an axe, for this you can duplicate the sword code and change the keys and
+the atk property.  
+```
+let setAxe = new Modifier({
+    key: 'axe-equip',
+    propertyKey: 'equipSet/weapon',
+    operation: ItemsConst.OPS.SET,
+    value: 'axe'
+});
+let axeAtk = new Modifier({
+    key: 'axe-atk',
+    propertyKey: 'atk',
+    operation: ItemsConst.OPS.INC,
+    value: 500 // this would be the atk points increase
+});
+let axeItem = new Equipment({
+    key: 'axe',
+    manager: itemServer.manager,
+    qty: 1,
+    modifiers: {'axe-equip': setAxe, 'axe-atk': axeAtk}
+});
+itemsServer.manager.addItem(axeItem);
+```
+- But before equip the axe you will need to remove the sword (otherwise sword modifiers won't be reverted:
+```
+itemsServer.manager.items['sword'].unequip();
+itemsServer.manager.items['axe'].equip();
+```
 
 
 ### [Reldens](https://github.com/damian-pastorini/reldens/ "Reldens")
