@@ -1,5 +1,5 @@
 {
-    "name": "reldens-items-system",
+    "name": "@reldens/items-system",
     "version": "0.1.0",
     "description": "Reldens - Items System",
     "source": true,
