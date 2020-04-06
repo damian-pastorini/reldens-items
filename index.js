@@ -14,5 +14,6 @@ module.exports = {
     ItemUsable: require('./lib/item/type/usable'),
     Modifier: require('./lib/item/modifier'),
     ItemsConst: require('./lib/constants'),
-    ItemsEvents: require('./lib/items-events')
+    ItemsEvents: require('./lib/items-events'),
+    Receiver: require('./lib/client/receiver')
 };
