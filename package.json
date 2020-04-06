@@ -40,8 +40,7 @@
     "license": "MIT",
     "dependencies": {
         "@reldens/utils": "^0.1.5",
-        "@reldens/storage": "^0.1.1",
-        "parcel-bundler": "^1.12.4"
+        "@reldens/storage": "^0.1.1"
     },
     "devDependencies": {}
 }
