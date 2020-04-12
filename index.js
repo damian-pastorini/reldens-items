@@ -1,6 +1,6 @@
 /**
  *
- * Reldens - Items Manager
+ * Reldens - Items System
  *
  */
 
@@ -9,7 +9,7 @@ module.exports = {
     ItemsManager: require('./lib/manager'),
     Inventory: require('./lib/item/inventory'),
     ItemGroup: require('./lib/item/group'),
-    ItemBase: require('./lib/item/type/item'),
+    ItemBase: require('./lib/item/type/item-base'),
     ItemEquipment: require('./lib/item/type/equipment'),
     ItemUsable: require('./lib/item/type/usable'),
     Modifier: require('./lib/item/modifier'),
