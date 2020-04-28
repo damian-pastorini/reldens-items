@@ -27,7 +27,7 @@ With the package I'll be including an SQL driver using Objection (since this is 
 
 ## How to?
 
-First install using npm: `npm install @reldens/items`
+First install using npm: `npm install @reldens/items-system`
 
 Once you have it you need to create an instance of the InventoryManager or the InventoryServer.
 
