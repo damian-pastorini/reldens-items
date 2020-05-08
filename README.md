@@ -82,7 +82,7 @@ What's a "modifier"??? Basically is an specification on "what the item will do" 
 - A modifier must have 4 required parameters, let's create an example one:
 ```
 const { Modifier, ItemsConst } = require('@reldens/items');
-let itemMod = {key: 'health', 'hp', ItemsConst.OPS.INC, 20};
+let itemMod = {key: 'health', propertyKey: 'hp', operation: ItemsConst.OPS.INC, value: 20};
 ```
 - And then we add it to the item which we will create below:
 ```
