@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `items_inventory` (
   `item_id` int(11) NOT NULL,
   `item_qty` int(11) NOT NULL,
   `remaining_uses` int(11) NOT NULL,
-  `is_active` int(1) NOT NULL COMMENT 'For example equiped or not equiped items.',
+  `is_active` int(1) NOT NULL COMMENT 'For example equipped or not equipped items.',
   PRIMARY KEY (`id`),
   KEY `FK_items_inventory_items_item` (`item_id`),
   CONSTRAINT `FK_items_inventory_items_item` FOREIGN KEY (`item_id`) REFERENCES `items_item` (`id`) ON UPDATE CASCADE
