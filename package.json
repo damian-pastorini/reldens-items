@@ -1,9 +1,13 @@
 {
     "name": "@reldens/items-system",
-    "version": "0.5.2",
+    "scope": "@reldens",
+    "version": "0.5.3",
     "description": "Reldens - Items System",
-    "source": true,
+    "author": "Damian A. Pastorini",
+    "license": "MIT",
     "homepage": "https://github.com/damian-pastorini/reldens-items",
+    "source": true,
+    "main": "index.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/damian-pastorini/reldens-items.git"
@@ -30,14 +34,8 @@
     "bugs": {
         "url": "https://github.com/damian-pastorini/reldens-items/issues"
     },
-    "engines": {
-        "node": "13.1.0"
-    },
-    "author": "Damian A. Pastorini",
-    "license": "MIT",
     "dependencies": {
         "@reldens/utils": "^0.1.5",
-        "@reldens/storage": "^0.1.4"
-    },
-    "devDependencies": {}
+        "@reldens/storage": "^0.1.5"
+    }
 }
