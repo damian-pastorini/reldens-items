@@ -35,8 +35,8 @@
         "url": "https://github.com/damian-pastorini/reldens-items/issues"
     },
     "dependencies": {
-        "@reldens/utils": "^0.1.7",
+        "@reldens/modifiers": "^0.1.3",
         "@reldens/storage": "^0.1.8",
-        "@reldens/modifiers": "^0.1.3"
+        "@reldens/utils": "^0.1.7"
     }
 }
