@@ -15,7 +15,6 @@ module.exports = {
     ItemSingle: require('./lib/item/type/single'),
     ItemSingleEquipment: require('./lib/item/type/single-equipment'),
     ItemSingleUsable: require('./lib/item/type/single-usable'),
-    Modifier: require('./lib/item/modifier'),
     ItemsConst: require('./lib/constants'),
     ItemsEvents: require('./lib/items-events'),
     Receiver: require('./lib/client/receiver')
