@@ -1,7 +1,7 @@
 {
     "name": "@reldens/items-system",
     "scope": "@reldens",
-    "version": "0.10.0-beta.30",
+    "version": "0.10.0-beta.31",
     "description": "Reldens - Items System",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -36,7 +36,7 @@
     },
     "dependencies": {
         "@reldens/modifiers": "^0.10.0-beta.2",
-        "@reldens/storage": "^0.10.0-beta.29",
+        "@reldens/storage": "^0.10.0-beta.30",
         "@reldens/utils": "^0.10.0-beta.3"
     }
 }
