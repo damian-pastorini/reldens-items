@@ -4,7 +4,7 @@
 
 ## About
 
-They idea behind this project is to cover the basics on how an inventory system work.
+The idea behind this project is to cover the basics on how an inventory system work.
 Using this package you will get the basic set of features and some more advance, for example, some basic features will be:
  - Manage the inventory add / set / remove items.
  - Modify items qty.
@@ -19,7 +19,7 @@ inventory status, etc.
 - Listen to the inventory events to run your customize actions. 
 - Possibility of use the available classes to create different item types, like an "equip" or "usable" items.
     - An "equip" item will check if the item was equipped in order to apply the item "modifiers".
-    - An "usable" item that will apply the "modifiers" to the specified target as many times until reach the "uses"
+    - A "usable" item that will apply the "modifiers" to the specified target as many times until reach the "uses"
 limit.
 - Create "modifiers", which will be executed by the item and will affect the target properties, for example: a
 "modifier" could be: property = "hp", "action" = "increase proportion", value = "100%" and the item will be basically
