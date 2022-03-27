@@ -25,8 +25,7 @@ limit.
 "modifier" could be: property = "hp", "action" = "increase proportion", value = "100%" and the item will be basically
 a health potion.
 
-With the package I'll be including an SQL driver using Objection (since this is basically for the Reldens project, but
-ideally open for others), and also a default client integrated with Colyseus.
+---
 
 Need something specific?
 
