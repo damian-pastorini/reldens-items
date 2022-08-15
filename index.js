@@ -15,7 +15,12 @@ module.exports = {
     ItemSingle: require('./lib/item/type/single'),
     ItemSingleEquipment: require('./lib/item/type/single-equipment'),
     ItemSingleUsable: require('./lib/item/type/single-usable'),
+    ModelEntity: require('./lib/item/model-entity'),
     ItemsConst: require('./lib/constants'),
     ItemsEvents: require('./lib/items-events'),
-    Receiver: require('./lib/client/receiver')
+    Receiver: require('./lib/client/receiver'),
+    ItemsDataGenerator: require('./lib/items-data-generator'),
+    GroupsDataGenerator: require('./lib/groups-data-generator'),
+    ExchangePlatform: require('./lib/exchange-platform'),
+    ExchangeRequirement: require('./lib/exchange-requirement')
 };
