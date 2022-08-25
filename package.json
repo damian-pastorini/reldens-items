@@ -1,7 +1,7 @@
 {
     "name": "@reldens/items-system",
     "scope": "@reldens",
-    "version": "0.16.0-beta.1",
+    "version": "0.16.0-beta.2",
     "description": "Reldens - Items System",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -17,6 +17,9 @@
         "items",
         "system",
         "item",
+        "shop",
+        "trade",
+        "exchange",
         "game",
         "mmorpg",
         "rpg",
@@ -35,7 +38,7 @@
         "url": "https://github.com/damian-pastorini/reldens-items/issues"
     },
     "dependencies": {
-        "@reldens/modifiers": "^0.16.0",
+        "@reldens/modifiers": "^0.17.0",
         "@reldens/storage": "^0.11.0",
         "@reldens/utils": "^0.16.0"
     }
