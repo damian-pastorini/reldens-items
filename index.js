@@ -23,5 +23,6 @@ module.exports = {
     ItemsDataGenerator: require('./lib/items-data-generator'),
     GroupsDataGenerator: require('./lib/groups-data-generator'),
     ExchangePlatform: require('./lib/exchange-platform'),
-    ExchangeRequirement: require('./lib/exchange-requirement')
+    ExchangeRequirement: require('./lib/exchange-requirement'),
+    ExchangeReward: require('./lib/exchange-reward')
 };
