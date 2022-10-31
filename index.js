@@ -22,7 +22,11 @@ module.exports = {
     Receiver: require('./lib/client/receiver'),
     ItemsDataGenerator: require('./lib/items-data-generator'),
     GroupsDataGenerator: require('./lib/groups-data-generator'),
-    ExchangePlatform: require('./lib/exchange-platform'),
-    ExchangeRequirement: require('./lib/exchange-requirement'),
-    ExchangeReward: require('./lib/exchange-reward')
+    ExchangePlatform: require('./lib/exchange/exchange-platform'),
+    ExchangeRequirement: require('./lib/exchange/exchange-requirement'),
+    RequirementsCollection: require('./lib/exchange/requirements-collection'),
+    RequirementsProcessor: require('./lib/exchange/requirements-processor'),
+    ExchangeReward: require('./lib/exchange/exchange-reward'),
+    RewardsCollection: require('./lib/exchange/rewards-collection'),
+    RewardsProcessor: require('./lib/exchange/rewards-processor')
 };
