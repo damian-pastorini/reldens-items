@@ -7,4 +7,3 @@
 /ts-node*
 /v8-compile-cache*
 /dev
-package-lock.json

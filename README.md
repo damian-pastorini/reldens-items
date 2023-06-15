@@ -5,7 +5,7 @@
 ## About
 
 The idea behind this project is to cover the basics on how an inventory system work.
-Using this package you will get the basic set of features and some more advance, for example, some basic features will be:
+Using this package you will get the basic set of features and some more advance, for example:
  - Manage the inventory add / set / remove items.
  - Modify items qty.
  - Have items groups.
@@ -24,9 +24,9 @@ limit.
 - Create "modifiers", which will be executed by the item and will affect the target properties, for example: a
 "modifier" could be: property = "hp", "action" = "increase proportion", value = "100%" and the item will be basically
 a health potion.
+- Items exchange between inventories to create a "shop" or just "trade" items.
 
-With the package I'll be including an SQL driver using Objection (since this is basically for the Reldens project, but
-ideally open for others), and also a default client integrated with Colyseus.
+---
 
 Need something specific?
 
