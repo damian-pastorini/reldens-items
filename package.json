@@ -1,7 +1,7 @@
 {
     "name": "@reldens/items-system",
     "scope": "@reldens",
-    "version": "0.20.0",
+    "version": "0.20.2",
     "description": "Reldens - Items System",
     "author": "Damian A. Pastorini",
     "license": "MIT",

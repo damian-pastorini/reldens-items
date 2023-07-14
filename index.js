@@ -29,5 +29,5 @@ module.exports = {
     ExchangeReward: require('./lib/exchange/exchange-reward'),
     RewardsCollection: require('./lib/exchange/rewards-collection'),
     RewardsProcessor: require('./lib/exchange/rewards-processor'),
-    ItemsError: require('lib/items-error')
+    ItemsError: require('./lib/items-error')
 };
