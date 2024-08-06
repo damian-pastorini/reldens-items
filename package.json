@@ -1,7 +1,7 @@
 {
     "name": "@reldens/items-system",
     "scope": "@reldens",
-    "version": "0.27.0",
+    "version": "0.28.0",
     "description": "Reldens - Items System",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -38,8 +38,8 @@
         "url": "https://github.com/damian-pastorini/reldens-items/issues"
     },
     "dependencies": {
-        "@reldens/modifiers": "^0.22.0",
-        "@reldens/storage": "^0.24.0",
-        "@reldens/utils": "^0.32.0"
+        "@reldens/modifiers": "^0.23.0",
+        "@reldens/storage": "^0.27.0",
+        "@reldens/utils": "^0.35.0"
     }
 }
