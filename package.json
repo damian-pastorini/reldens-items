@@ -1,7 +1,7 @@
 {
     "name": "@reldens/items-system",
     "scope": "@reldens",
-    "version": "0.45.0",
+    "version": "0.46.0",
     "description": "Reldens - Items System",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -37,8 +37,14 @@
     "bugs": {
         "url": "https://github.com/damian-pastorini/reldens-items/issues"
     },
+    "scripts": {
+        "test": "node tests/run-tests.js",
+        "test:watch": "node --watch tests/run-tests.js",
+        "test:filter": "node tests/run-tests.js --filter=",
+        "test:coverage": "node --test --experimental-test-coverage tests/run-tests.js"
+    },
     "dependencies": {
-        "@reldens/modifiers": "^0.32.0",
+        "@reldens/modifiers": "^0.33.0",
         "@reldens/utils": "^0.54.0"
     }
 }
