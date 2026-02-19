@@ -15,7 +15,6 @@ module.exports = {
     ItemSingle: require('./lib/item/type/single'),
     ItemSingleEquipment: require('./lib/item/type/single-equipment'),
     ItemSingleUsable: require('./lib/item/type/single-usable'),
-    ItemsFactory: require('./lib/items-factory'),
     ModelEntity: require('./lib/item/model-entity'),
     ItemsConst: require('./lib/constants'),
     ItemsEvents: require('./lib/items-events'),

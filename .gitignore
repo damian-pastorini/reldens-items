@@ -7,3 +7,7 @@
 /ts-node*
 /v8-compile-cache*
 /dev
+/.claude/settings.json
+/.claude/settings.local.json
+/.claude/instructions.md
+/CLAUDE.local.md

@@ -4,27 +4,113 @@
 
 ## About
 
-The idea behind this project is to cover the basics on how an inventory system work.
-Using this package you will get the basic set of features and some more advance, for example:
- - Manage the inventory add / set / remove items.
- - Modify items qty.
- - Have items groups.
- - Set limits per inventory, per items group, and per item itself.
+**@reldens/items-system** is the items and inventory management system for Reldens. This package provides a comprehensive set of features for managing items, inventories, equipment, and item exchanges in game environments.
 
-And then you will get other more advanced features like:
+### Core Features
 
-- Implement it with different storage system, to manage the available items, modifiers, groups, persist and update the
-inventory status, etc.
-- Implement it with different "clients" who will receive information about every inventory action.
-- Listen to the inventory events to run your customize actions. 
-- Possibility of use the available classes to create different item types, like an "equip" or "usable" items.
-    - An "equip" item will check if the item was equipped in order to apply the item "modifiers".
-    - A "usable" item that will apply the "modifiers" to the specified target as many times until reach the "uses"
-limit.
-- Create "modifiers", which will be executed by the item and will affect the target properties, for example: a
-"modifier" could be: property = "hp", "action" = "increase proportion", value = "100%" and the item will be basically
-a health potion.
-- Items exchange between inventories to create a "shop" or just "trade" items.
+**Item Management:**
+- Create and manage different item types (weapons, armor, consumables, quest items, etc.)
+- Item modifiers and stats system
+- Item properties (durability, quantity, requirements)
+- Trade and sell values
+
+**Inventory System:**
+- Player inventory management
+- Item storage and retrieval
+- Inventory limits and organization
+- Add / set / remove items
+- Item quantity management
+- Item groups with customizable limits
+
+**Equipment System:**
+- Equip/unequip items functionality
+- Equipment validation
+- Stat calculations with equipped items
+- Multiple equipment slots support
+
+**Item Types:**
+- **ItemBase**: Base item class with core properties
+- **ItemEquipment**: Items that can be equipped to provide stat bonuses
+- **ItemUsable**: Consumable items with usage limits that apply modifiers
+- **ItemSingle**: Single instance items (non-stackable)
+- **ItemSingleEquipment**: Single instance equippable items
+- **ItemSingleUsable**: Single instance usable items
+
+**Exchange System:**
+- Item trading between inventories
+- Shop/merchant system
+- Exchange requirements and validation
+- Exchange rewards processing
+- Requirements and rewards collections
+
+**Advanced Features:**
+- Event-driven architecture for inventory actions
+- Client/server architecture with receiver and sender components
+- Modifiers system (using @reldens/modifiers) for item effects
+- Server authoritative validation
+- Database-driven configuration
+- Extensible architecture for custom item types
+
+## Installation
+
+```bash
+npm install @reldens/items-system
+```
+
+## Usage
+
+```javascript
+const {
+    ItemsManager,
+    Inventory,
+    ItemGroup,
+    ItemBase,
+    ItemEquipment,
+    ItemUsable,
+    ExchangePlatform
+} = require('@reldens/items-system');
+
+// Create an inventory
+const inventory = new Inventory();
+
+// Create items
+const item = new ItemBase({ id: 1, key: 'potion', qty: 5 });
+
+// Add items to inventory
+inventory.addItem(item);
+
+// Create item groups with limits
+const weaponsGroup = new ItemGroup({ id: 1, key: 'weapons', limit: 10 });
+
+// Use exchange platform for trading
+const exchange = new ExchangePlatform();
+```
+
+## API
+
+### Main Exports
+
+- **ItemsServer**: Server-side items management
+- **ItemsManager**: Core item management system
+- **Inventory**: Inventory management
+- **ItemGroup**: Item grouping and organization
+- **ItemBase**: Base item class
+- **ItemEquipment**: Equippable items
+- **ItemUsable**: Usable/consumable items
+- **ItemSingle**: Single instance items
+- **ItemSingleEquipment**: Single instance equippable items
+- **ItemSingleUsable**: Single instance usable items
+- **ExchangePlatform**: Trading and exchange system
+- **Receiver**: Client-side receiver for item updates
+- **ItemsConst**: Constants used throughout the system
+- **ItemsEvents**: Event types for item system
+- **ItemsError**: Error handling
+
+## Testing
+
+```bash
+npm test
+```
 
 ---
 
