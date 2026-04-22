@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Package Overview
 
 **@reldens/items-system** (v0.45.0) is a comprehensive items and inventory management system for Reldens. It provides:
