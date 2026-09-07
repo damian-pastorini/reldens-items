@@ -1,7 +1,7 @@
 {
     "name": "@reldens/items-system",
     "scope": "@reldens",
-    "version": "0.52.0",
+    "version": "0.53.0",
     "description": "Reldens - Items System",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -44,7 +44,7 @@
         "test:coverage": "node --test --experimental-test-coverage tests/run-tests.js"
     },
     "dependencies": {
-        "@reldens/modifiers": "^0.37.0",
-        "@reldens/utils": "^0.57.0"
+        "@reldens/modifiers": "^0.38.0",
+        "@reldens/utils": "^0.58.0"
     }
 }
