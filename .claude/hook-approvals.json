@@ -1,1 +1,14 @@
-{}
+{
+    "alvmbx": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\inventory.js",
+        "snippet": "addItems:#0",
+        "approved_at": "2026-09-16T12:15:41.695Z"
+    },
+    "21llio": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\exchange\\exchange-platform.js",
+        "snippet": "executeExchangeFromTo:#0",
+        "approved_at": "2026-09-17T04:48:06.771Z"
+    }
+}

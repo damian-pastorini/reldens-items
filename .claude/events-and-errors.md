@@ -115,6 +115,7 @@ All error codes are prefixed with `items.` by default.
 - `items.lockedForModifyItemQty` - Inventory locked, cannot modify quantity
 - `items.undefinedItemKeyForOperation` - Item key undefined for operation
 - `items.qtyNotANumber` - Quantity is not a number
+- `items.qtyNegative` - Negative quantity on increase or decrease
 - `items.itemQtyLimitExceeded` - Item quantity limit exceeded
 - `items.lockedForSetItems` - Inventory locked, cannot set items
 

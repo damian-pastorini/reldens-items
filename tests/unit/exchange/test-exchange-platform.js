@@ -154,6 +154,35 @@ describe('ExchangePlatform', () => {
             let result = await platform.pushForExchange('fake-uid', 1, 'A');
             assert.strictEqual(result, false);
         });
+
+        it('should reject negative quantity', async () => {
+            let itemUid = Object.keys(inventoryA.items)[0];
+            let result = await platform.pushForExchange(itemUid, -5, 'A');
+            assert.strictEqual(result, false);
+            assert.strictEqual(platform.lastError.code, ItemsConst.ERROR_CODES.EXCHANGE.INVALID_PUSHED_QUANTITY);
+            assert.strictEqual(Object.keys(platform.exchangeBetween.A).length, 0);
+        });
+
+        it('should reject zero quantity', async () => {
+            let itemUid = Object.keys(inventoryA.items)[0];
+            let result = await platform.pushForExchange(itemUid, 0, 'A');
+            assert.strictEqual(result, false);
+            assert.strictEqual(platform.lastError.code, ItemsConst.ERROR_CODES.EXCHANGE.INVALID_PUSHED_QUANTITY);
+        });
+
+        it('should reject decimal quantity', async () => {
+            let itemUid = Object.keys(inventoryA.items)[0];
+            let result = await platform.pushForExchange(itemUid, 0.5, 'A');
+            assert.strictEqual(result, false);
+            assert.strictEqual(platform.lastError.code, ItemsConst.ERROR_CODES.EXCHANGE.INVALID_PUSHED_QUANTITY);
+        });
+
+        it('should reject string quantity', async () => {
+            let itemUid = Object.keys(inventoryA.items)[0];
+            let result = await platform.pushForExchange(itemUid, '1', 'A');
+            assert.strictEqual(result, false);
+            assert.strictEqual(platform.lastError.code, ItemsConst.ERROR_CODES.EXCHANGE.INVALID_PUSHED_QUANTITY);
+        });
     });
 
     describe('removeFromExchange', () => {
