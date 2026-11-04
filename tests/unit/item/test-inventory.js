@@ -290,6 +290,26 @@ describe('Inventory', () => {
             assert.strictEqual(inventory.lastError.code, ItemsConst.ERROR_CODES.QTY_NOT_A_NUMBER);
         });
 
+        it('should fail when decreasing with a negative qty', async () => {
+            let itemData = {...BaseItemsFixtures.basicItem, qty: 5, manager: manager};
+            let item = new ItemBase(itemData);
+            await inventory.addItem(item);
+            let result = await inventory.decreaseItemQty(item.getInventoryId(), -10);
+            assert.strictEqual(result, false);
+            assert.strictEqual(inventory.lastError.code, ItemsConst.ERROR_CODES.QTY_NEGATIVE);
+            assert.strictEqual(item.qty, 5);
+        });
+
+        it('should fail when increasing with a negative qty', async () => {
+            let itemData = {...BaseItemsFixtures.basicItem, qty: 5, manager: manager};
+            let item = new ItemBase(itemData);
+            await inventory.addItem(item);
+            let result = await inventory.increaseItemQty(item.getInventoryId(), -3);
+            assert.strictEqual(result, false);
+            assert.strictEqual(inventory.lastError.code, ItemsConst.ERROR_CODES.QTY_NEGATIVE);
+            assert.strictEqual(item.qty, 5);
+        });
+
         it('should fail when exceeding limitPerItem on set', async () => {
             inventory.limitPerItem = 10;
             let itemData = {...BaseItemsFixtures.basicItem, manager: manager};

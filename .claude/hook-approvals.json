@@ -1,0 +1,128 @@
+{
+    "126951": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\server\\sender.js",
+        "snippet": "sendSetGroupsData:#0",
+        "approved_at": "2026-11-02T18:12:40.043Z"
+    },
+    "alvmbx": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\inventory.js",
+        "snippet": "addItems:#0",
+        "approved_at": "2026-09-16T12:15:41.695Z"
+    },
+    "21llio": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\exchange\\exchange-platform.js",
+        "snippet": "executeExchangeFromTo:#0",
+        "approved_at": "2026-09-17T04:48:06.771Z"
+    },
+    "vhwlzu": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\growth\\item-growth-calculator.js",
+        "snippet": "levelFor:#0",
+        "approved_at": "2026-11-04T17:19:42.253Z"
+    },
+    "oc1qve": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\growth\\item-growth-leveler.js",
+        "snippet": "addOwnerExperience:#0",
+        "approved_at": "2026-11-04T17:19:47.068Z"
+    },
+    "g2omdw": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\growth\\item-growth-leveler.js",
+        "snippet": "scaleModifiers:#0",
+        "approved_at": "2026-11-04T17:19:47.069Z"
+    },
+    "hnwfzp": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\type\\item-base.js",
+        "snippet": "changeModifiers:#0",
+        "approved_at": "2026-11-04T17:18:20.486Z"
+    },
+    "v686j5": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\item\\type\\item-base.js",
+        "snippet": "updateProperties:#0",
+        "approved_at": "2026-11-04T17:18:20.484Z"
+    },
+    "2jc9r3": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\server\\sender.js",
+        "snippet": "getItemProperties:#0",
+        "approved_at": "2026-11-02T18:12:40.042Z"
+    },
+    "2g15lh": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\server\\sender.js",
+        "snippet": "extractItemsDataForSend:#0",
+        "approved_at": "2026-11-02T18:12:40.044Z"
+    },
+    "oq0knc": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\server\\sender.js",
+        "snippet": "getTargetProps:#0",
+        "approved_at": "2026-11-02T18:12:40.044Z"
+    },
+    "2kaq0u": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\client\\receiver.js",
+        "snippet": "onSetItems:#0",
+        "approved_at": "2026-11-04T17:24:09.931Z"
+    },
+    "26bxeg": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\lib\\client\\receiver.js",
+        "snippet": "onSetGroups:#0",
+        "approved_at": "2026-11-04T17:24:09.932Z"
+    },
+    "e4nlg7": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\item\\type\\test-item-base.js",
+        "snippet": "describe:#0",
+        "approved_at": "2026-11-04T17:22:23.322Z"
+    },
+    "vha1tq": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\utils\\test-helpers.js",
+        "snippet": "recordEvents:#0",
+        "approved_at": "2026-11-04T17:21:39.680Z"
+    },
+    "c3cm8a": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\item\\growth\\test-item-growth-leveler.js",
+        "snippet": "describe:#0",
+        "approved_at": "2026-11-04T17:23:22.521Z"
+    },
+    "c3cm8b": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\item\\growth\\test-item-growth-leveler.js",
+        "snippet": "describe:#1",
+        "approved_at": "2026-11-04T17:23:22.522Z"
+    },
+    "c3cm8c": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\item\\growth\\test-item-growth-leveler.js",
+        "snippet": "describe:#2",
+        "approved_at": "2026-11-04T17:23:22.523Z"
+    },
+    "4x5ebr": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\client\\test-receiver.js",
+        "snippet": "describe:#0",
+        "approved_at": "2026-11-04T17:24:36.467Z"
+    },
+    "c3cm8d": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\item\\growth\\test-item-growth-leveler.js",
+        "snippet": "describe:#3",
+        "approved_at": "2026-11-04T17:23:22.524Z"
+    },
+    "e4nlg8": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-items\\tests\\unit\\item\\type\\test-item-base.js",
+        "snippet": "describe:#1",
+        "approved_at": "2026-11-04T17:22:23.323Z"
+    }
+}

@@ -239,6 +239,10 @@ Base class for all item types. Contains core properties and modifier handling.
 - `revertModifiers()` - Async revert all modifiers from target
 - `changeModifiers(revert)` - Generic modifier change method
 - `isType(type)` - Check if item is specific type
+- `setCustomData(rawCustomData)` - Keeps the raw custom data and spreads the parsed object (JSON string or object) on
+  the item, used by the constructor and by the item updates
+- `updateProperties(props)` - Assigns the received properties to the item (`customData` through `setCustomData()`),
+  never the `ItemsConst.NOT_UPDATABLE_PROPERTIES` (`idx`, `uid`, `manager`)
 - `fireEvent(eventName, ...args)` - Fire event through manager
 - `listenEvent(eventName, callback, removeKey, masterKey)` - Listen to event
 
@@ -345,6 +349,52 @@ Registry mapping type IDs to item classes.
 **Methods:**
 - `list()` - Returns all types object
 - `classByTypeId(typeId)` - Returns class for type ID (defaults to ItemBase)
+
+## Item Growth
+
+An item with a `growth` custom data grows with the experience gained by its owner:
+
+```json
+{"growth": {"experienceShare": 100, "modifiersIncreasePercentPerLevel": 50, "requireEquipped": true, "levels": {"2": 5, "3": 30}}}
+```
+
+- `experienceShare` - Percent of the owner experience the item receives (100 when missing)
+- `requireEquipped` - Only an equipped item grows, unless it is `false`
+- `levels` - Experience required by every level, the level never goes down
+- `modifiersIncreasePercentPerLevel` - Every level after the first increases the modifiers values by that percent of
+  their original value (the `ItemsConst.GROWTH.NOT_SCALABLE_OPERATIONS`: SET, METHOD and SET_N, are never scaled)
+
+Every item instance keeps its own `growthLevel` and `growthExperience`. The package never stores them: the integration
+loads them, passes them to `initializeItem()` and saves them on `GROWTH_EXPERIENCE_ADDED`.
+
+### ItemGrowthLeveler (`lib/item/growth/item-growth-leveler.js`)
+
+**Methods:**
+- `initializeItem(item, level, experience)` - Sets the item level and experience (the default level and no experience
+  for missing or invalid values) and scales its modifiers, returns false for the items without growth
+- `addOwnerExperience(manager, experienceAdded)` - Adds the experience to every growing item of the manager, returns the
+  number of items that received experience
+- `addItemExperience(item, experienceAdded)` - Queues the experience on the item (`pendingGrowth`, the calls on the same
+  item run in order) and returns the `applyItemExperience()` result, false for the items without growth
+- `applyItemExperience(item, experienceAdded)` - Adds the item share of the experience, levels the item up when it
+  reached a new level and fires `GROWTH_EXPERIENCE_ADDED` (item, item experience)
+- `levelUpItem(item, reachedLevel)` - Unequips an equipped item, sets the level, scales the modifiers, fires
+  `GROWTH_LEVEL_UP` (item, its listeners can still change the item data before it is sent) and `UPDATE_ITEM` (item, the
+  Sender sends the update action) and equips the item again; a failed unequip stops it (level and modifiers unchanged)
+- `runGrowthStep(item, stepName, step)` - Runs a growth step, a failure is logged and stored as the manager `lastError`
+  (`items.growth.stepFailed`, data `{itemUid, stepName}`) and returns false
+- `scaleModifiers(item)` - Sets every scalable modifier value for the item level from its original value
+- `fetchGrowableItems(manager)` - The manager items with a growth custom data
+
+### ItemGrowthCalculator (`lib/item/growth/item-growth-calculator.js`)
+
+**Static Methods:**
+- `experienceFor(experienceShare, experienceAdded)` - The item share of the experience, rounded down (0 for a zero or
+  negative share and for a zero, negative or invalid experience)
+- `levelFor(experience, levels, currentLevel)` - The highest level the experience reached, never below the current level
+- `scaledValue(originalValue, level, increasePercentPerLevel)` - The original value increased by the percent on every
+  level after the first (an integer value is rounded away from zero on the halves, a decimal value keeps its decimals,
+  a value that is not a number is returned unchanged)
 
 ## Exchange System
 
@@ -472,6 +522,8 @@ Server-side message sender for client updates.
 - Listens to manager events
 - Sends item updates to client
 - Formats messages for client consumption
+- Sends `ACTION_UPDATE` on `UPDATE_ITEM` (`sendUpdateItemData(item)`), by default with the item `id`, `key`,
+  `growthLevel` and `growthExperience` (more properties can be added to `sendProperties[ACTION_UPDATE].send`)
 
 ### Receiver (`lib/client/receiver.js`)
 
@@ -481,6 +533,8 @@ Client-side message receiver for server updates.
 - Receives item updates from server
 - Updates client-side item state
 - Triggers client-side events
+- `onUpdateItem(message)` handles `ACTION_UPDATE`: updates the existing client item with `updateProperties()` and fires
+  `UPDATE_ITEM` on the client manager (a missing item is logged in `recieveErrorsLog`)
 
 ## Data Generators
 
@@ -556,6 +610,7 @@ Event name constants for the entire system.
 - Manager events (MANAGER_INIT)
 - Inventory events (ADD_ITEM, REMOVE_ITEM, MODIFY_ITEM_QTY, SET_ITEMS, SET_GROUPS)
 - Equipment events (EQUIP_ITEM, UNEQUIP_ITEM, EQUIP_BEFORE, EQUIP)
+- Item update and growth events (UPDATE_ITEM, GROWTH_LEVEL_UP, GROWTH_EXPERIENCE_ADDED)
 - Exchange events (INITIALIZED, CANCELED, ITEM_PUSHED, ITEM_REMOVE, CONFIRM, FINALIZED, etc.)
 - Item execution events (EXECUTING_ITEM, EXECUTED_ITEM)
 - Validation events (VALIDATE)
@@ -571,6 +626,8 @@ System-wide constants.
 - `BEHAVIOR_*` - Communication behaviors (SEND, BROADCAST, BOTH)
 - `TYPES` - Item type constants
 - `TRADE_ACTIONS` - Trade action types (BUY, SELL, TRADE)
+- `NOT_UPDATABLE_PROPERTIES` - Item properties an update never replaces (`idx`, `uid`, `manager`)
+- `GROWTH` - Item growth `DEFAULT_LEVEL` (1), `PERCENT_BASE` (100) and `NOT_SCALABLE_OPERATIONS`
 - `ERROR_CODES` - Complete error code registry
 
 ## Common Patterns

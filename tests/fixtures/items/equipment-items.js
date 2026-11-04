@@ -4,6 +4,8 @@
  *
  */
 
+const { sc } = require('@reldens/utils');
+
 module.exports.EquipmentItemsFixtures = {
     simpleEquipment: {
         id: 9,
@@ -60,5 +62,22 @@ module.exports.EquipmentItemsFixtures = {
         label: 'Stackable Equipment',
         description: 'Equipment that can stack',
         qty: 5
+    },
+    growingSword: {
+        id: 14,
+        item_id: 14,
+        key: 'test-growing-sword',
+        type: 1,
+        label: 'Growing Sword',
+        description: 'A sword that grows with the experience of its owner',
+        qty: 1,
+        customData: sc.toJsonString({
+            growth: {
+                experienceShare: 50,
+                modifiersIncreasePercentPerLevel: 50,
+                requireEquipped: true,
+                levels: {'2': 5, '3': 30, '4': 90, '5': 200}
+            }
+        })
     }
 };

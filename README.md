@@ -36,6 +36,11 @@
 - **ItemSingleEquipment**: Single instance equippable items
 - **ItemSingleUsable**: Single instance usable items
 
+**Item Growth:**
+- Items with a `growth` custom data level up with the experience gained by their owner
+- Configurable experience share, levels, equipped-only growth and modifiers increase per level
+- Item update events and messages so the clients receive the grown item data
+
 **Exchange System:**
 - Item trading between inventories
 - Shop/merchant system
@@ -100,6 +105,8 @@ const exchange = new ExchangePlatform();
 - **ItemSingle**: Single instance items
 - **ItemSingleEquipment**: Single instance equippable items
 - **ItemSingleUsable**: Single instance usable items
+- **ItemGrowthLeveler**: Items growth with the owner experience (levels and modifiers scaling)
+- **ItemGrowthCalculator**: Items growth maths (experience share, reached level, scaled modifier value)
 - **ExchangePlatform**: Trading and exchange system
 - **Receiver**: Client-side receiver for item updates
 - **ItemsConst**: Constants used throughout the system

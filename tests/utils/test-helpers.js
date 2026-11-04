@@ -4,6 +4,9 @@
  *
  */
 
+const Equipment = require('../../lib/item/type/equipment');
+const { EquipmentItemsFixtures } = require('../fixtures/items/equipment-items');
+const { Modifier, ModifierConst } = require('@reldens/modifiers');
 const { EventsManagerSingleton } = require('@reldens/utils');
 
 class TestHelpers
@@ -63,6 +66,56 @@ class TestHelpers
     static clearEventListeners()
     {
         EventsManagerSingleton.removeAllListeners();
+    }
+
+    static createGrowingSword(manager, props = {})
+    {
+        return new Equipment(Object.assign({}, EquipmentItemsFixtures.growingSword, {
+            manager,
+            modifiers: {
+                attack: new Modifier({
+                    key: 'attack',
+                    propertyKey: 'stats/atk',
+                    operation: ModifierConst.OPS.INC,
+                    value: 10,
+                    target: manager.owner
+                })
+            }
+        }, props));
+    }
+
+    static async createEquippedGrowingSword(manager, leveler, level, experience)
+    {
+        let sword = TestHelpers.createGrowingSword(manager);
+        leveler.initializeItem(sword, level, experience);
+        await sword.equip();
+        return sword;
+    }
+
+    static recordEvents(manager, eventNames)
+    {
+        let firedEvents = [];
+        for(let eventName of eventNames){
+            manager.listenEvent(eventName, (...args) => firedEvents.push({eventName, args}), 'record.'+eventName);
+        }
+        return firedEvents;
+    }
+
+    static listenFailure(manager, eventName)
+    {
+        let listenerError = new Error('Failed listener: '+eventName);
+        manager.listenEvent(eventName, () => {
+            throw listenerError;
+        }, 'failure.'+eventName);
+        return listenerError;
+    }
+
+    static createMessagesClient()
+    {
+        let messagesClient = {sentMessages: []};
+        messagesClient.send = async (message) => messagesClient.sentMessages.push(message);
+        messagesClient.broadcast = async (message) => messagesClient.sentMessages.push(message);
+        return messagesClient;
     }
 
     static generateUniqueId(prefix = 'test')
