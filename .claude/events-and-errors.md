@@ -57,6 +57,19 @@ All events are prefixed with `reldens.items.` by default.
 - `reldens.items.equipRevertedModifiers` - After reverting modifiers
   - Payload: `item`
 
+### Item Update And Growth Events
+
+- `reldens.items.updateItem` - An existing item data changed (the Sender sends the update action, the Receiver fires it
+  on the client manager after updating the client item)
+  - Payload: `item`
+
+- `reldens.items.growthLevelUp` - A growing item reached a new level, its modifiers are already scaled and the item
+  update is not sent yet
+  - Payload: `item`
+
+- `reldens.items.growthExperienceAdded` - A growing item received experience (after its level up, if any)
+  - Payload: `item, itemExperience`
+
 ### Item Execution Events
 
 - `reldens.items.executingItem` - Before item execution
@@ -155,6 +168,11 @@ All error codes are prefixed with `items.` by default.
 - `items.equipment.modifiersApply` - Failed to apply equipment modifiers
 - `items.equipment.modifiersRevert` - Failed to revert equipment modifiers
 
+### Growth Error Codes
+
+- `items.growth.stepFailed` - A growth step failed (the unequip, a `GROWTH_LEVEL_UP`, `UPDATE_ITEM` or
+  `GROWTH_EXPERIENCE_ADDED` listener, or the equip again), data: `{itemUid, stepName}`, the error is in `withError`
+
 ## Action Constants
 
 Used for client/server communication.
@@ -164,6 +182,7 @@ Used for client/server communication.
 - `rinvM` - Modify quantity action
 - `rinvE` - Equip item action
 - `rinvU` - Unequip item action
+- `rinvUp` - Update item action
 - `rinvMa` - Modifier applied action
 - `rinvMr` - Modifier reverted action
 - `rinvEx` - Executing item action

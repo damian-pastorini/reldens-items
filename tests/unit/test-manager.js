@@ -134,7 +134,7 @@ describe('ItemsManager', () => {
             manager = new ItemsManager({owner: mockOwner});
             manager.listenEvent(ItemsEvents.MANAGER_INIT, () => {
                 eventFired = true;
-            });
+            }, 'managerInitTest');
             await manager.setup({});
             assert.strictEqual(eventFired, true);
         });

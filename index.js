@@ -15,6 +15,8 @@ module.exports = {
     ItemSingle: require('./lib/item/type/single'),
     ItemSingleEquipment: require('./lib/item/type/single-equipment'),
     ItemSingleUsable: require('./lib/item/type/single-usable'),
+    ItemGrowthCalculator: require('./lib/item/growth/item-growth-calculator'),
+    ItemGrowthLeveler: require('./lib/item/growth/item-growth-leveler'),
     ModelEntity: require('./lib/item/model-entity'),
     ItemsConst: require('./lib/constants'),
     ItemsEvents: require('./lib/items-events'),

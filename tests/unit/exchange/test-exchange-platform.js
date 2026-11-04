@@ -9,11 +9,9 @@ const assert = require('node:assert');
 const ExchangePlatform = require('../../../lib/exchange/exchange-platform');
 const RequirementsCollection = require('../../../lib/exchange/requirements-collection');
 const RewardsCollection = require('../../../lib/exchange/rewards-collection');
-const Inventory = require('../../../lib/item/inventory');
 const ItemBase = require('../../../lib/item/type/item-base');
 const ItemsManager = require('../../../lib/manager');
 const ItemsConst = require('../../../lib/constants');
-const ItemsEvents = require('../../../lib/items-events');
 const { TestHelpers } = require('../../utils/test-helpers');
 const { BaseItemsFixtures } = require('../../fixtures/items/base-items');
 const { MockOwner } = require('../../fixtures/mocks/mock-owner');
@@ -30,10 +28,10 @@ describe('ExchangePlatform', () => {
     beforeEach(() => {
         ownerA = new MockOwner('owner-a');
         ownerB = new MockOwner('owner-b');
-        managerA = new ItemsManager({owner: ownerA});
-        managerB = new ItemsManager({owner: ownerB});
-        inventoryA = new Inventory({key: 'inv-a', owner_id: 'owner-a'});
-        inventoryB = new Inventory({key: 'inv-b', owner_id: 'owner-b'});
+        managerA = new ItemsManager({key: 'inv-a', owner_id: 'owner-a', owner: ownerA});
+        managerB = new ItemsManager({key: 'inv-b', owner_id: 'owner-b', owner: ownerB});
+        inventoryA = managerA;
+        inventoryB = managerB;
         platform = new ExchangePlatform({});
         TestHelpers.clearEventListeners();
     });

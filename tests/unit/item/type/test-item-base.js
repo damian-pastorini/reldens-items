@@ -12,6 +12,7 @@ const ItemsConst = require('../../../../lib/constants');
 const { TestHelpers } = require('../../../utils/test-helpers');
 const { BaseItemsFixtures } = require('../../../fixtures/items/base-items');
 const { MockOwner } = require('../../../fixtures/mocks/mock-owner');
+const { sc } = require('@reldens/utils');
 
 describe('ItemBase', () => {
     let mockOwner;
@@ -99,6 +100,77 @@ describe('ItemBase', () => {
             assert.strictEqual(item.qty, 0);
             assert.strictEqual(item.is_active, false);
             assert.strictEqual(item.singleInstance, false);
+        });
+    });
+
+    describe('setCustomData', () => {
+        it('should spread an object or a JSON string custom data and keep the raw value', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager});
+            let objectCustomData = {growthLevel: 2, modifiersDisplay: ['+15 atk']};
+            item.setCustomData(objectCustomData);
+            assert.strictEqual(item.rawCustomData, objectCustomData);
+            assert.strictEqual(item.growthLevel, 2);
+            assert.deepStrictEqual(item.modifiersDisplay, ['+15 atk']);
+            item.setCustomData('{"growthLevel":3}');
+            assert.strictEqual(item.rawCustomData, '{"growthLevel":3}');
+            assert.strictEqual(item.growthLevel, 3);
+            assert.deepStrictEqual(item.modifiersDisplay, ['+15 atk']);
+        });
+
+        it('should keep the item properties when the custom data is empty, null or an invalid JSON', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager, customData: {power: 100}});
+            for(let emptyCustomData of [{}, null, 'not-a-json', '']){
+                item.setCustomData(emptyCustomData);
+                assert.strictEqual(item.rawCustomData, emptyCustomData);
+                assert.strictEqual(item.power, 100);
+                assert.strictEqual(item.key, 'test-basic-item');
+            }
+        });
+    });
+
+    describe('updateProperties', () => {
+        it('should assign the received properties and spread the received custom data', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager, uid: 'item-uid'});
+            assert.strictEqual(item.updateProperties({
+                key: 'test-basic-item',
+                growthLevel: 2,
+                growthExperience: 9,
+                customData: {modifiersDisplay: ['+15 atk'], growthLevel: 2}
+            }), true);
+            assert.strictEqual(item.growthLevel, 2);
+            assert.strictEqual(item.growthExperience, 9);
+            assert.deepStrictEqual(item.modifiersDisplay, ['+15 atk']);
+            assert.deepStrictEqual(item.rawCustomData, {modifiersDisplay: ['+15 atk'], growthLevel: 2});
+            assert.strictEqual(sc.hasOwn(item, 'customData'), false);
+            assert.strictEqual(item.label, 'Basic Test Item');
+        });
+
+        it('should never replace the item inventory index, uid or manager', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager, uid: 'item-uid'});
+            assert.strictEqual(item.updateProperties({idx: 'other-uid', uid: 'other-uid', manager: {}, qty: 3}), true);
+            assert.strictEqual(item.uid, 'item-uid');
+            assert.strictEqual(item.manager, manager);
+            assert.strictEqual(sc.hasOwn(item, 'idx'), false);
+            assert.strictEqual(item.getInventoryId(), 'item-uid');
+            assert.strictEqual(item.qty, 3);
+        });
+
+        it('should keep the item unchanged when no properties are received', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager, uid: 'item-uid'});
+            assert.strictEqual(item.updateProperties({}), true);
+            assert.strictEqual(item.qty, 1);
+            assert.strictEqual(item.label, 'Basic Test Item');
+            assert.deepStrictEqual(item.rawCustomData, {});
+        });
+
+        it('should reject the received properties that are not an object and keep the item unchanged', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager, uid: 'item-uid'});
+            for(let invalidProperties of [null, false, 'qty', 3, ['qty']]){
+                assert.strictEqual(item.updateProperties(invalidProperties), false);
+                assert.strictEqual(item.qty, 1);
+                assert.strictEqual(item.getInventoryId(), 'item-uid');
+                assert.strictEqual(sc.hasOwn(item, '0'), false);
+            }
         });
     });
 

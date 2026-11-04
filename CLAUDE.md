@@ -77,6 +77,20 @@ npm test
 - Combination of Single + Usable
 - Stackable consumable items
 
+### Item Growth
+
+**ItemGrowthLeveler** (`lib/item/growth/item-growth-leveler.js`):
+- Grows the items with a `growth` custom data with the experience gained by their owner
+- `initializeItem()` with the stored level and experience, `addOwnerExperience()` on every experience gained
+- A level up unequips an equipped item, scales its modifiers, fires `GROWTH_LEVEL_UP` and `UPDATE_ITEM` and equips it
+  again; `GROWTH_EXPERIENCE_ADDED` follows every experience added (the integration persists the growth there)
+- The experience added to the same item runs in order (the experience received during a level up is never lost); a
+  failed step is stored as the manager `lastError` (`items.growth.stepFailed`): a failed unequip stops the level up, the
+  failed listeners never stop the equip again
+
+**ItemGrowthCalculator** (`lib/item/growth/item-growth-calculator.js`):
+- Experience share, reached level and scaled modifier value (`ItemsConst.GROWTH`)
+
 **ItemTypes** (`lib/item/item-types.js`):
 - Registry of item type classes
 - Type ID to class mapping
@@ -112,11 +126,13 @@ npm test
 - Server-side message sender
 - Sends item updates to client
 - Event-driven communication
+- `UPDATE_ITEM` sends `ACTION_UPDATE` with the configured properties of an existing item
 
 **Receiver** (`lib/client/receiver.js`):
 - Client-side message receiver
 - Processes server item updates
 - Updates client-side state
+- `ACTION_UPDATE` updates the existing client item (`ItemBase.updateProperties()`) and fires `UPDATE_ITEM`
 
 ### Data Generators
 
@@ -143,7 +159,8 @@ npm test
 
 **ItemsEvents** (`lib/items-events.js`):
 - Event name constants
-- Events: MANAGER_INIT, ADD_ITEM, REMOVE_ITEM, MODIFY_ITEM_QTY, EQUIP_ITEM, UNEQUIP_ITEM, EXCHANGE events, etc.
+- Events: MANAGER_INIT, ADD_ITEM, REMOVE_ITEM, MODIFY_ITEM_QTY, EQUIP_ITEM, UNEQUIP_ITEM, UPDATE_ITEM, GROWTH_LEVEL_UP,
+  GROWTH_EXPERIENCE_ADDED, EXCHANGE events, etc.
 
 **Constants** (`lib/constants.js`):
 - Item type constants
