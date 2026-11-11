@@ -266,6 +266,30 @@ describe('ItemGrowthLeveler', () => {
             assert.strictEqual(manager.owner.stats.atk, 25);
         });
 
+        it('should not equip the item again when it was equipped during the level up', async () => {
+            let sword = await TestHelpers.createEquippedGrowingSword(manager, leveler, 1, 4);
+            firedEvents.splice(0);
+            manager.listenEvent(ItemsEvents.GROWTH_LEVEL_UP, async (item) => await item.equip(), 'equipDuringLevelUp');
+            assert.strictEqual(await leveler.addItemExperience(sword, 10), true);
+            assert.strictEqual(sword.growthLevel, 2);
+            assert.strictEqual(sword.equipped, true);
+            assert.strictEqual(manager.owner.stats.atk, 25);
+            let equipEvents = firedEvents.filter(firedEvent => ItemsEvents.EQUIP_ITEM === firedEvent.eventName);
+            assert.strictEqual(equipEvents.length, 1);
+        });
+
+        it('should keep the pending level up on the item until it is done', async () => {
+            let sword = await TestHelpers.createEquippedGrowingSword(manager, leveler, 1, 4);
+            let equippedStates = [];
+            manager.listenEvent(ItemsEvents.GROWTH_LEVEL_UP, (item) => equippedStates.push(item.equipped), 'levelUpState');
+            let levelUp = leveler.addItemExperience(sword, 10);
+            await sword.pendingGrowth;
+            equippedStates.push(sword.equipped);
+            assert.strictEqual(await levelUp, true);
+            assert.deepStrictEqual(equippedStates, [false, true]);
+            assert.strictEqual(manager.owner.stats.atk, 25);
+        });
+
         it('should not grow the items without growth', async () => {
             let basicItem = new ItemBase({...BaseItemsFixtures.basicItem, manager});
             assert.strictEqual(await leveler.addItemExperience(basicItem, 10), false);
