@@ -44,7 +44,7 @@ describe('Receiver', () => {
                 act: ItemsConst.ACTION_UPDATE,
                 owner: owner.id,
                 item: {
-                    idx: 'sword-uid',
+                    'idx': 'sword-uid',
                     id: clientSword.id,
                     key: clientSword.key,
                     growthLevel: 2,
@@ -62,7 +62,7 @@ describe('Receiver', () => {
         });
 
         it('should log the update of a missing item without firing the item update', async () => {
-            let message = {act: ItemsConst.ACTION_UPDATE, owner: owner.id, item: {idx: 'missing-uid', growthLevel: 2}};
+            let message = {act: ItemsConst.ACTION_UPDATE, owner: owner.id, item: {'idx': 'missing-uid', growthLevel: 2}};
             assert.strictEqual(await receiver.onUpdateItem(message), false);
             assert.deepStrictEqual(receiver.recieveErrorsLog, [
                 {'Error receiver onUpdateItem.': 'Item not found: missing-uid'}
@@ -86,8 +86,8 @@ describe('Receiver', () => {
             );
             await receiver.manager.setItems({'sword-uid': clientSword});
             let listenerError = TestHelpers.listenFailure(receiver.manager, ItemsEvents.UPDATE_ITEM);
-            let message = {act: ItemsConst.ACTION_UPDATE, owner: owner.id, item: {idx: 'sword-uid', growthLevel: 2}};
-            assert.strictEqual(await receiver.onUpdateItem(message), true);
+            let message = {act: ItemsConst.ACTION_UPDATE, owner: owner.id, item: {'idx': 'sword-uid', growthLevel: 2}};
+            assert.strictEqual(await receiver.processMessage(message), false);
             assert.strictEqual(clientSword.growthLevel, 2);
             assert.deepStrictEqual(clientEvents, [{eventName: ItemsEvents.UPDATE_ITEM, args: [clientSword]}]);
             assert.deepStrictEqual(receiver.recieveErrorsLog, [{'Error receiver onUpdateItem.': listenerError}]);
@@ -113,7 +113,7 @@ describe('Receiver', () => {
                 ItemsConst.ACTION_MOD_APPLIED
             ]);
             for(let message of messagesClient.sentMessages){
-                receiver.processMessage(message);
+                await receiver.processMessage(message);
             }
             let clientSword = receiver.manager.items[serverSword.getInventoryId()];
             assert.strictEqual(clientSword.growthLevel, serverSword.growthLevel);
@@ -121,6 +121,121 @@ describe('Receiver', () => {
             assert.strictEqual(clientSword.equipped, true);
             assert.deepStrictEqual(clientEvents, [{eventName: ItemsEvents.UPDATE_ITEM, args: [clientSword]}]);
             assert.deepStrictEqual(receiver.recieveErrorsLog, []);
+        });
+    });
+
+    describe('process message', () => {
+        let clientSword;
+
+        beforeEach(async () => {
+            clientSword = new Equipment(
+                {...EquipmentItemsFixtures.growingSword, manager: receiver.manager, uid: 'sword-uid', qty: 1}
+            );
+            await receiver.manager.setItems({'sword-uid': clientSword});
+        });
+
+        it('should skip the messages without the items action prefix or with an unknown action', async () => {
+            assert.strictEqual(await receiver.processMessage({act: 'other-action'}), false);
+            assert.strictEqual(await receiver.processMessage({}), false);
+            assert.strictEqual(await receiver.processMessage({act: ItemsConst.ACTIONS_PREF+'unknown'}), false);
+            receiver.actions[ItemsConst.ACTIONS_PREF+'missing'] = 'onMissingMethod';
+            assert.strictEqual(await receiver.processMessage({act: ItemsConst.ACTIONS_PREF+'missing'}), false);
+            assert.deepStrictEqual(receiver.recieveErrorsLog, []);
+        });
+
+        it('should return the result of every replicated action', async () => {
+            let addMessage = {
+                act: ItemsConst.ACTION_ADD,
+                item: {...EquipmentItemsFixtures.basicSword, 'idx': 'basic-sword-uid', qty: 1}
+            };
+            let addedItem = await receiver.processMessage(addMessage);
+            assert.strictEqual(addedItem, receiver.manager.items['basic-sword-uid']);
+            assert.strictEqual(addedItem.getInventoryId(), 'basic-sword-uid');
+            let setQtyMessage = {act: ItemsConst.ACTION_MODIFY_QTY, item: {'idx': 'sword-uid', qty: 3}};
+            assert.strictEqual(await receiver.processMessage(setQtyMessage), true);
+            assert.strictEqual(clientSword.qty, 3);
+            let equipMessage = {act: ItemsConst.ACTION_EQUIP, item: {'idx': 'sword-uid'}};
+            assert.strictEqual(await receiver.processMessage(equipMessage), true);
+            assert.strictEqual(clientSword.equipped, true);
+            let unequipMessage = {act: ItemsConst.ACTION_UNEQUIP, item: {'idx': 'sword-uid'}};
+            assert.strictEqual(await receiver.processMessage(unequipMessage), true);
+            assert.strictEqual(clientSword.equipped, false);
+            let removeMessage = {act: ItemsConst.ACTION_REMOVE, item: {'idx': 'basic-sword-uid'}};
+            assert.strictEqual(await receiver.processMessage(removeMessage), true);
+            assert.strictEqual(sc.hasOwn(receiver.manager.items, 'basic-sword-uid'), false);
+            assert.deepStrictEqual(receiver.recieveErrorsLog, []);
+        });
+
+        it('should return the failed result of an action the manager rejects without logging an error', async () => {
+            let removeMessage = {act: ItemsConst.ACTION_REMOVE, item: {'idx': 'missing-uid'}};
+            assert.strictEqual(await receiver.processMessage(removeMessage), false);
+            assert.strictEqual(receiver.manager.lastError.code, ItemsConst.ERROR_CODES.KEY_NOT_FOUND);
+            assert.deepStrictEqual(receiver.recieveErrorsLog, []);
+        });
+
+        it('should log the error of every failed action under its method name and keep processing', async () => {
+            let failedActions = [
+                {
+                    eventName: ItemsEvents.ADD_ITEM,
+                    message: {
+                        act: ItemsConst.ACTION_ADD,
+                        item: {...EquipmentItemsFixtures.basicSword, 'idx': 'basic-sword-uid', qty: 1}
+                    },
+                    method: 'onAddItem'
+                },
+                {
+                    eventName: ItemsEvents.MODIFY_ITEM_QTY,
+                    message: {act: ItemsConst.ACTION_MODIFY_QTY, item: {'idx': 'sword-uid', qty: 2}},
+                    method: 'onSetQty'
+                },
+                {
+                    eventName: ItemsEvents.EQUIP_ITEM,
+                    message: {act: ItemsConst.ACTION_EQUIP, item: {'idx': 'sword-uid'}},
+                    method: 'onEquipItem'
+                },
+                {
+                    eventName: ItemsEvents.UNEQUIP_ITEM,
+                    message: {act: ItemsConst.ACTION_UNEQUIP, item: {'idx': 'sword-uid'}},
+                    method: 'onUnequipItem'
+                },
+                {
+                    eventName: ItemsEvents.REMOVE_ITEM,
+                    message: {act: ItemsConst.ACTION_REMOVE, item: {'idx': 'sword-uid'}},
+                    method: 'onRemoveItem'
+                },
+                {
+                    eventName: ItemsEvents.SET_ITEMS,
+                    message: {act: ItemsConst.ACTION_SET_ITEMS, items: {}},
+                    method: 'onSetItems'
+                },
+                {
+                    eventName: ItemsEvents.SET_GROUPS,
+                    message: {act: ItemsConst.ACTION_SET_GROUPS, groups: {}},
+                    method: 'onSetGroups'
+                }
+            ];
+            let expectedErrorsLog = [];
+            for(let failedAction of failedActions){
+                let listenerError = TestHelpers.listenFailure(receiver.manager, failedAction.eventName);
+                assert.strictEqual(await receiver.processMessage(failedAction.message), false);
+                expectedErrorsLog.push({['Error receiver '+failedAction.method+'.']: listenerError});
+            }
+            assert.deepStrictEqual(receiver.recieveErrorsLog, expectedErrorsLog);
+            assert.strictEqual(clientSword.qty, 2);
+            assert.strictEqual(clientSword.equipped, false);
+        });
+
+        it('should log the equip and unequip of a missing item instead of throwing', async () => {
+            let equipMessage = {act: ItemsConst.ACTION_EQUIP, item: {'idx': 'missing-uid'}};
+            assert.strictEqual(await receiver.processMessage(equipMessage), false);
+            let unequipMessage = {act: ItemsConst.ACTION_UNEQUIP, item: {'idx': 'missing-uid'}};
+            assert.strictEqual(await receiver.processMessage(unequipMessage), false);
+            assert.deepStrictEqual(receiver.recieveErrorsLog.map(loggedError => Object.keys(loggedError)[0]), [
+                'Error receiver onEquipItem.',
+                'Error receiver onUnequipItem.'
+            ]);
+            assert.ok(receiver.recieveErrorsLog[0]['Error receiver onEquipItem.'] instanceof TypeError);
+            assert.ok(receiver.recieveErrorsLog[1]['Error receiver onUnequipItem.'] instanceof TypeError);
         });
     });
 });
