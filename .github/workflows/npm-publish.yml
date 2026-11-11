@@ -127,13 +127,13 @@ jobs:
           PKG_VERSION="${{ steps.meta.outputs.version }}"
           DIST_TAG="${{ steps.disttag.outputs.value }}"
           for ATTEMPT in 1 2 3 4 5 6 7 8 9 10; do
-            FOUND=$(npm view "$PKG_NAME@$PKG_VERSION" version --registry=https://registry.npmjs.org/ --prefer-online --loglevel=error 2>&1 || true)
-            TAGGED=$(npm view "$PKG_NAME" "dist-tags.$DIST_TAG" --registry=https://registry.npmjs.org/ --prefer-online --loglevel=error 2>&1 || true)
+            FOUND=$(npm view "$PKG_NAME@$PKG_VERSION" version --registry=https://registry.npmjs.org/ --prefer-online --loglevel=error 2>/dev/null || true)
+            TAGGED=$(npm view "$PKG_NAME" "dist-tags.$DIST_TAG" --registry=https://registry.npmjs.org/ --prefer-online --loglevel=error 2>/dev/null || true)
             if [ "$FOUND" = "$PKG_VERSION" ] && [ "$TAGGED" = "$PKG_VERSION" ]; then
               echo "Confirmed on the registry: $PKG_NAME@$PKG_VERSION with dist-tag $DIST_TAG."
               exit 0
             fi
-            echo "Attempt $ATTEMPT not confirmed, version: [$FOUND], dist-tag $DIST_TAG: [$TAGGED]. Retry in 60s."
+            echo "Attempt $ATTEMPT: $PKG_NAME@$PKG_VERSION is not on the registry yet, the dist-tag $DIST_TAG points to [${TAGGED:-none}]. Retry in 60s."
             sleep 60
           done
           echo "::error::$PKG_NAME@$PKG_VERSION with dist-tag $DIST_TAG was not confirmed on the registry after 10 minutes. Check https://www.npmjs.com/package/$PKG_NAME before releasing again, published versions are immutable."
