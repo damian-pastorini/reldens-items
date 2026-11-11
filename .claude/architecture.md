@@ -376,8 +376,9 @@ loads them, passes them to `initializeItem()` and saves them on `GROWTH_EXPERIEN
   number of items that received experience
 - `addItemExperience(item, experienceAdded)` - Queues the experience on the item (`pendingGrowth`, the calls on the same
   item run in order) and returns the `applyItemExperience()` result, false for the items without growth
-- `applyItemExperience(item, experienceAdded)` - Adds the item share of the experience, levels the item up when it
-  reached a new level and fires `GROWTH_EXPERIENCE_ADDED` (item, item experience)
+- `applyItemExperience(item, experienceAdded)` - Waits for the previous experience of the same item,
+  adds the item share of the experience, levels the item up when it reached a new level and fires
+  `GROWTH_EXPERIENCE_ADDED` (item, item experience)
 - `levelUpItem(item, reachedLevel)` - Unequips an equipped item, sets the level, scales the modifiers, fires
   `GROWTH_LEVEL_UP` (item, its listeners can still change the item data before it is sent) and `UPDATE_ITEM` (item, the
   Sender sends the update action) and equips the item again; a failed unequip stops it (level and modifiers unchanged)
@@ -535,6 +536,8 @@ Client-side message receiver for server updates.
 - Triggers client-side events
 - `onUpdateItem(message)` handles `ACTION_UPDATE`: updates the existing client item with `updateProperties()` and fires
   `UPDATE_ITEM` on the client manager (a missing item is logged in `recieveErrorsLog`)
+- `processMessage(message)` awaits the action method and returns its result; a failed action (a rejected listener or a
+  missing equipment item) is logged and stored in `recieveErrorsLog` under its method name, and it returns false
 
 ## Data Generators
 
