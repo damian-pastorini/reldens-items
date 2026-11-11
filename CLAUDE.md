@@ -133,6 +133,8 @@ npm test
 - Processes server item updates
 - Updates client-side state
 - `ACTION_UPDATE` updates the existing client item (`ItemBase.updateProperties()`) and fires `UPDATE_ITEM`
+- `processMessage()` awaits the action method and returns its result; a failed action is logged and stored in
+  `recieveErrorsLog` under its method name, and it returns false
 
 ### Data Generators
 
