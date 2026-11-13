@@ -134,27 +134,28 @@ describe('Receiver', () => {
             await itemsServer.manager.setItems({[serverSword.getInventoryId()]: serverSword});
             await serverSword.equip();
             await itemsServer.manager.removeItem(serverSword.getInventoryId());
-            let clientUnequips = TestHelpers.recordEvents(receiver.manager, [ItemsEvents.UNEQUIP_ITEM]);
+            let clientReceiver = new Receiver({owner, eventsManager: new EventsManager(), unequipOnRemove});
+            let clientUnequips = TestHelpers.recordEvents(clientReceiver.manager, [ItemsEvents.UNEQUIP_ITEM]);
             for(let message of messagesClient.sentMessages){
-                await receiver.processMessage(message);
+                await clientReceiver.processMessage(message);
             }
             return [
                 messagesClient.sentMessages.map(message => message.act),
                 clientUnequips.length,
-                Object.keys(receiver.manager.items).length,
-                receiver.recieveErrorsLog
+                Object.keys(clientReceiver.manager.items).length,
+                clientReceiver.recieveErrorsLog
             ];
         };
 
-        it('should create its own manager with the unequip on remove off and keep a given manager as it is', () => {
+        it('should create its manager with the given unequipOnRemove option and keep a given manager as it is', () => {
             let givenManager = new ItemsServer({owner, eventsManager: new EventsManager()}).manager;
             assert.deepStrictEqual(
                 [
                     receiver.manager.unequipOnRemove,
-                    new Receiver({owner, manager: givenManager}).manager === givenManager,
-                    givenManager.unequipOnRemove
+                    new Receiver({owner, eventsManager: new EventsManager(), unequipOnRemove: false}).manager.unequipOnRemove,
+                    new Receiver({owner, manager: givenManager}).manager === givenManager
                 ],
-                [false, true, true]
+                [true, false, true]
             );
         });
 
