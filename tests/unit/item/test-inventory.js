@@ -9,12 +9,15 @@ const assert = require('node:assert');
 const Inventory = require('../../../lib/item/inventory');
 const ItemBase = require('../../../lib/item/type/item-base');
 const ItemSingle = require('../../../lib/item/type/single');
+const Equipment = require('../../../lib/item/type/equipment');
+const ItemGrowthLeveler = require('../../../lib/item/growth/item-growth-leveler');
 const ItemsManager = require('../../../lib/manager');
 const ItemsConst = require('../../../lib/constants');
 const ItemsEvents = require('../../../lib/items-events');
 const { TestHelpers } = require('../../utils/test-helpers');
 const { BaseItemsFixtures } = require('../../fixtures/items/base-items');
 const { SingleItemsFixtures } = require('../../fixtures/items/single-items');
+const { EquipmentItemsFixtures } = require('../../fixtures/items/equipment-items');
 const { InventoryFixtures } = require('../../fixtures/inventories/test-inventories');
 const { MockOwner } = require('../../fixtures/mocks/mock-owner');
 
@@ -220,6 +223,74 @@ describe('Inventory', () => {
             let result = await inventory.removeItem('non-existent-key');
             assert.strictEqual(result, false);
             assert.strictEqual(inventory.lastError.code, ItemsConst.ERROR_CODES.KEY_NOT_FOUND);
+        });
+
+        let createEquipment = async (equipped, removeSteps) => {
+            let item = new Equipment({
+                ...EquipmentItemsFixtures.basicSword,
+                manager: manager,
+                equipped,
+                modifiers: {
+                    mod1: {
+                        apply: () => {
+                            removeSteps.push('apply');
+                        },
+                        revert: () => {
+                            removeSteps.push('revert');
+                        }
+                    }
+                }
+            });
+            item.target = mockOwner;
+            await inventory.addItem(item);
+            inventory.listenEvent(ItemsEvents.REMOVE_ITEM, () => removeSteps.push('remove'), 'removeItemTest', 'tests');
+            return item;
+        };
+
+        it('should unequip an equipped item and revert its modifiers before removing it', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(true, removeSteps);
+            let result = await inventory.removeItem(item.getInventoryId());
+            assert.deepStrictEqual(
+                [result, item.equipped, removeSteps, Object.keys(inventory.items).length],
+                [true, false, ['revert', 'remove'], 0]
+            );
+        });
+
+        it('should remove a not equipped item without unequipping it', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(false, removeSteps);
+            let result = await inventory.removeItem(item.getInventoryId());
+            assert.deepStrictEqual([result, item.equipped, removeSteps], [true, false, ['remove']]);
+        });
+
+        it('should keep an equipped item equipped when the inventory is locked', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(true, removeSteps);
+            inventory.locked = true;
+            let result = await inventory.removeItem(item.getInventoryId());
+            assert.deepStrictEqual([result, item.equipped, removeSteps], [false, true, []]);
+        });
+
+        it('should wait for the item growth level up before unequipping it', async () => {
+            let leveler = new ItemGrowthLeveler();
+            let sword = await TestHelpers.createEquippedGrowingSword(manager, leveler, 1, 0);
+            await inventory.addItem(sword);
+            let firedEvents = TestHelpers.recordEvents(manager, [ItemsEvents.GROWTH_LEVEL_UP, ItemsEvents.UNEQUIP_ITEM]);
+            let growth = leveler.addItemExperience(sword, 20);
+            let result = await inventory.removeItem(sword.getInventoryId());
+            await growth;
+            assert.deepStrictEqual(
+                [result, sword.equipped, firedEvents.map(firedEvent => firedEvent.eventName)],
+                [true, false, [ItemsEvents.UNEQUIP_ITEM, ItemsEvents.GROWTH_LEVEL_UP, ItemsEvents.UNEQUIP_ITEM]]
+            );
+        });
+
+        it('should unequip an equipped item removed by a decrease to zero quantity', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(true, removeSteps);
+            let result = await inventory.decreaseItemQty(item.getInventoryId(), 1);
+            assert.deepStrictEqual([result, item.equipped, removeSteps], [true, false, ['revert', 'remove']]);
         });
     });
 

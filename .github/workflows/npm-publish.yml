@@ -126,15 +126,20 @@ jobs:
           PKG_NAME="${{ steps.meta.outputs.name }}"
           PKG_VERSION="${{ steps.meta.outputs.version }}"
           DIST_TAG="${{ steps.disttag.outputs.value }}"
-          for ATTEMPT in 1 2 3 4 5 6 7 8 9 10; do
-            FOUND=$(npm view "$PKG_NAME@$PKG_VERSION" version --registry=https://registry.npmjs.org/ --prefer-online --loglevel=error 2>/dev/null || true)
-            TAGGED=$(npm view "$PKG_NAME" "dist-tags.$DIST_TAG" --registry=https://registry.npmjs.org/ --prefer-online --loglevel=error 2>/dev/null || true)
-            if [ "$FOUND" = "$PKG_VERSION" ] && [ "$TAGGED" = "$PKG_VERSION" ]; then
-              echo "Confirmed on the registry: $PKG_NAME@$PKG_VERSION with dist-tag $DIST_TAG."
+          ENCODED_NAME=$(printf '%s' "$PKG_NAME" | sed 's|/|%2F|g')
+          for ATTEMPT in $(seq 1 40); do
+            STAMP=$(date +%s%N)
+            VERSION_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -H 'Cache-Control: no-cache' \
+              "https://registry.npmjs.org/$ENCODED_NAME/$PKG_VERSION?cache=$STAMP" || true)
+            TAGGED=$(curl -s -H 'Cache-Control: no-cache' \
+              "https://registry.npmjs.org/-/package/$ENCODED_NAME/dist-tags?cache=$STAMP" \
+              | grep -o "\"$DIST_TAG\":\"[^\"]*\"" | head -n 1 | cut -d'"' -f4 || true)
+            if [ "$VERSION_STATUS" = "200" ] && [ "$TAGGED" = "$PKG_VERSION" ]; then
+              echo "Confirmed on the registry after $ATTEMPT checks: $PKG_NAME@$PKG_VERSION with dist-tag $DIST_TAG."
               exit 0
             fi
-            echo "Attempt $ATTEMPT: $PKG_NAME@$PKG_VERSION is not on the registry yet, the dist-tag $DIST_TAG points to [${TAGGED:-none}]. Retry in 60s."
-            sleep 60
+            echo "Check $ATTEMPT: the version document answered [$VERSION_STATUS], the dist-tag $DIST_TAG points to [${TAGGED:-none}]. Next check in 15s."
+            sleep 15
           done
           echo "::error::$PKG_NAME@$PKG_VERSION with dist-tag $DIST_TAG was not confirmed on the registry after 10 minutes. Check https://www.npmjs.com/package/$PKG_NAME before releasing again, published versions are immutable."
           exit 1
