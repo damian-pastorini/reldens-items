@@ -96,6 +96,7 @@ Core inventory management with add/remove/modify operations.
 - `itemsLimit` - Max total items (-1 = disabled)
 - `applyModifiersAuto` - Auto-apply modifiers (default: true)
 - `revertModifiersAuto` - Auto-revert modifiers (default: true)
+- `unequipOnRemove` - Unequip an equipped item before it is removed, after its pending growth (default: true)
 - `eventsPrefix` - Event name prefix
 
 **Properties:**
