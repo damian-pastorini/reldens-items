@@ -12,6 +12,7 @@ const ItemSingle = require('../../../lib/item/type/single');
 const Equipment = require('../../../lib/item/type/equipment');
 const ItemGrowthLeveler = require('../../../lib/item/growth/item-growth-leveler');
 const ItemsManager = require('../../../lib/manager');
+const ItemsServer = require('../../../lib/server');
 const ItemsConst = require('../../../lib/constants');
 const ItemsEvents = require('../../../lib/items-events');
 const { TestHelpers } = require('../../utils/test-helpers');
@@ -230,21 +231,24 @@ describe('Inventory', () => {
                 ...EquipmentItemsFixtures.basicSword,
                 manager: manager,
                 equipped,
-                modifiers: {
-                    mod1: {
-                        apply: () => {
-                            removeSteps.push('apply');
-                        },
-                        revert: () => {
-                            removeSteps.push('revert');
-                        }
-                    }
-                }
+                modifiers: {mod1: TestHelpers.createStepsModifier(removeSteps)}
             });
             item.target = mockOwner;
             await inventory.addItem(item);
             inventory.listenEvent(ItemsEvents.REMOVE_ITEM, () => removeSteps.push('remove'), 'removeItemTest', 'tests');
             return item;
+        };
+
+        let removeDuringGrowthLevelUp = async (unequipOnRemove) => {
+            let leveler = new ItemGrowthLeveler();
+            let sword = await TestHelpers.createEquippedGrowingSword(manager, leveler, 1, 0);
+            await inventory.addItem(sword);
+            inventory.unequipOnRemove = unequipOnRemove;
+            let firedEvents = TestHelpers.recordEvents(manager, [ItemsEvents.GROWTH_LEVEL_UP, ItemsEvents.UNEQUIP_ITEM]);
+            let growth = leveler.addItemExperience(sword, 20);
+            let result = await inventory.removeItem(sword.getInventoryId());
+            await growth;
+            return [result, sword.equipped, firedEvents.map(firedEvent => firedEvent.eventName)];
         };
 
         it('should unequip an equipped item and revert its modifiers before removing it', async () => {
@@ -272,16 +276,64 @@ describe('Inventory', () => {
             assert.deepStrictEqual([result, item.equipped, removeSteps], [false, true, []]);
         });
 
-        it('should wait for the item growth level up before unequipping it', async () => {
-            let leveler = new ItemGrowthLeveler();
-            let sword = await TestHelpers.createEquippedGrowingSword(manager, leveler, 1, 0);
-            await inventory.addItem(sword);
-            let firedEvents = TestHelpers.recordEvents(manager, [ItemsEvents.GROWTH_LEVEL_UP, ItemsEvents.UNEQUIP_ITEM]);
-            let growth = leveler.addItemExperience(sword, 20);
-            let result = await inventory.removeItem(sword.getInventoryId());
-            await growth;
+        it('should remove an equipped item as it is when unequipOnRemove is off', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(true, removeSteps);
+            inventory.unequipOnRemove = false;
+            let result = await inventory.removeItem(item.getInventoryId());
+            assert.deepStrictEqual([result, item.equipped, removeSteps], [true, true, ['remove']]);
+        });
+
+        it('should unequip on remove by default and keep the unequipOnRemove option', () => {
             assert.deepStrictEqual(
-                [result, sword.equipped, firedEvents.map(firedEvent => firedEvent.eventName)],
+                [new Inventory({}).unequipOnRemove, new Inventory({unequipOnRemove: false}).unequipOnRemove],
+                [true, false]
+            );
+        });
+
+        it('should pass the unequipOnRemove option through the items manager and the items server', () => {
+            assert.deepStrictEqual(
+                [
+                    new ItemsManager({owner: mockOwner}).unequipOnRemove,
+                    new ItemsManager({owner: mockOwner, unequipOnRemove: false}).unequipOnRemove,
+                    new ItemsServer({owner: mockOwner, unequipOnRemove: false}).manager.unequipOnRemove
+                ],
+                [true, false, false]
+            );
+        });
+
+        it('should answer the unequipBeforeRemove result by the option and the item equipped state', async () => {
+            let removeSteps = [];
+            let equippedItem = await createEquipment(true, removeSteps);
+            inventory.unequipOnRemove = false;
+            let optionOffResult = await inventory.unequipBeforeRemove(equippedItem);
+            inventory.unequipOnRemove = true;
+            let notEquippedResult = await inventory.unequipBeforeRemove({equipped: false});
+            let equippedResult = await inventory.unequipBeforeRemove(equippedItem);
+            assert.deepStrictEqual(
+                [optionOffResult, notEquippedResult, equippedResult, equippedItem.equipped, removeSteps],
+                [false, false, true, false, ['revert']]
+            );
+        });
+
+        it('should remove an equipped item decreased to zero quantity as it is when unequipOnRemove is off', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(true, removeSteps);
+            inventory.unequipOnRemove = false;
+            let result = await inventory.decreaseItemQty(item.getInventoryId(), 1);
+            assert.deepStrictEqual([result, item.equipped, removeSteps], [true, true, ['remove']]);
+        });
+
+        it('should not wait for the item growth nor unequip the item when unequipOnRemove is off', async () => {
+            assert.deepStrictEqual(
+                await removeDuringGrowthLevelUp(false),
+                [true, true, [ItemsEvents.UNEQUIP_ITEM, ItemsEvents.GROWTH_LEVEL_UP]]
+            );
+        });
+
+        it('should wait for the item growth level up before unequipping it', async () => {
+            assert.deepStrictEqual(
+                await removeDuringGrowthLevelUp(true),
                 [true, false, [ItemsEvents.UNEQUIP_ITEM, ItemsEvents.GROWTH_LEVEL_UP, ItemsEvents.UNEQUIP_ITEM]]
             );
         });

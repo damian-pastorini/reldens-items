@@ -63,6 +63,18 @@ class TestHelpers
         };
     }
 
+    static createStepsModifier(steps)
+    {
+        return {
+            apply: () => {
+                steps.push('apply');
+            },
+            revert: () => {
+                steps.push('revert');
+            }
+        };
+    }
+
     static clearEventListeners()
     {
         EventsManagerSingleton.removeAllListeners();

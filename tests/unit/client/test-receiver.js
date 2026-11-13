@@ -124,6 +124,67 @@ describe('Receiver', () => {
         });
     });
 
+    describe('remove item', () => {
+        let replicateEquippedItemRemoval = async (unequipOnRemove) => {
+            let messagesClient = TestHelpers.createMessagesClient();
+            let itemsServer = new ItemsServer(
+                {owner, client: messagesClient, eventsManager: new EventsManager(), unequipOnRemove}
+            );
+            let serverSword = TestHelpers.createGrowingSword(itemsServer.manager);
+            await itemsServer.manager.setItems({[serverSword.getInventoryId()]: serverSword});
+            await serverSword.equip();
+            await itemsServer.manager.removeItem(serverSword.getInventoryId());
+            let clientReceiver = new Receiver({owner, eventsManager: new EventsManager(), unequipOnRemove});
+            let clientUnequips = TestHelpers.recordEvents(clientReceiver.manager, [ItemsEvents.UNEQUIP_ITEM]);
+            for(let message of messagesClient.sentMessages){
+                await clientReceiver.processMessage(message);
+            }
+            return [
+                messagesClient.sentMessages.map(message => message.act),
+                clientUnequips.length,
+                Object.keys(clientReceiver.manager.items).length,
+                clientReceiver.recieveErrorsLog
+            ];
+        };
+
+        it('should create its manager with the given unequipOnRemove option and keep a given manager as it is', () => {
+            let givenManager = new ItemsServer({owner, eventsManager: new EventsManager()}).manager;
+            assert.deepStrictEqual(
+                [
+                    receiver.manager.unequipOnRemove,
+                    new Receiver({owner, eventsManager: new EventsManager(), unequipOnRemove: false}).manager.unequipOnRemove,
+                    new Receiver({owner, manager: givenManager}).manager === givenManager
+                ],
+                [true, false, true]
+            );
+        });
+
+        it('should replicate the server unequip and removal of an equipped item', async () => {
+            assert.deepStrictEqual(await replicateEquippedItemRemoval(true), [
+                [
+                    ItemsConst.ACTION_SET_ITEMS,
+                    ItemsConst.ACTION_EQUIP,
+                    ItemsConst.ACTION_MOD_APPLIED,
+                    ItemsConst.ACTION_UNEQUIP,
+                    ItemsConst.ACTION_MOD_REVERTED,
+                    ItemsConst.ACTION_REMOVE
+                ],
+                1,
+                0,
+                []
+            ]);
+        });
+
+        it('should remove an equipped item without its own unequip when the server does not unequip it', async () => {
+            assert.deepStrictEqual(await replicateEquippedItemRemoval(false), [
+                [ItemsConst.ACTION_SET_ITEMS, ItemsConst.ACTION_EQUIP, ItemsConst.ACTION_MOD_APPLIED, ItemsConst.ACTION_REMOVE],
+                0,
+                0,
+                []
+            ]);
+        });
+    });
+
     describe('process message', () => {
         let clientSword;
 
