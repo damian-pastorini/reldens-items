@@ -230,16 +230,7 @@ describe('Inventory', () => {
                 ...EquipmentItemsFixtures.basicSword,
                 manager: manager,
                 equipped,
-                modifiers: {
-                    mod1: {
-                        apply: () => {
-                            removeSteps.push('apply');
-                        },
-                        revert: () => {
-                            removeSteps.push('revert');
-                        }
-                    }
-                }
+                modifiers: {mod1: TestHelpers.createStepsModifier(removeSteps)}
             });
             item.target = mockOwner;
             await inventory.addItem(item);
@@ -270,6 +261,21 @@ describe('Inventory', () => {
             inventory.locked = true;
             let result = await inventory.removeItem(item.getInventoryId());
             assert.deepStrictEqual([result, item.equipped, removeSteps], [false, true, []]);
+        });
+
+        it('should remove an equipped item as it is when unequipOnRemove is off', async () => {
+            let removeSteps = [];
+            let item = await createEquipment(true, removeSteps);
+            inventory.unequipOnRemove = false;
+            let result = await inventory.removeItem(item.getInventoryId());
+            assert.deepStrictEqual([result, item.equipped, removeSteps], [true, true, ['remove']]);
+        });
+
+        it('should unequip on remove by default and keep the unequipOnRemove option', () => {
+            assert.deepStrictEqual(
+                [new Inventory({}).unequipOnRemove, new Inventory({unequipOnRemove: false}).unequipOnRemove],
+                [true, false]
+            );
         });
 
         it('should wait for the item growth level up before unequipping it', async () => {
