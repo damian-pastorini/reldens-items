@@ -346,6 +346,49 @@ describe('Inventory', () => {
         });
     });
 
+    describe('toggleEquip', () => {
+        let addGroupEquipment = async (fixture, groupId, equipped) => {
+            let item = new Equipment({...fixture, manager: manager, group_id: groupId, equipped, modifiers: {}});
+            await inventory.addItem(item);
+            return item;
+        };
+
+        it('should unequip the equipped item of the same group and equip the item', async () => {
+            let equippedSword = await addGroupEquipment(EquipmentItemsFixtures.basicSword, 1, true);
+            let equippedShield = await addGroupEquipment(EquipmentItemsFixtures.basicShield, 2, true);
+            let armor = await addGroupEquipment(EquipmentItemsFixtures.enchantedArmor, 1, false);
+            let result = await inventory.toggleEquip(armor);
+            assert.deepStrictEqual(
+                [result, armor.equipped, equippedSword.equipped, equippedShield.equipped],
+                [true, true, false, true]
+            );
+        });
+
+        it('should unequip an equipped item and keep the other items as they are', async () => {
+            let equippedSword = await addGroupEquipment(EquipmentItemsFixtures.basicSword, 1, true);
+            let equippedShield = await addGroupEquipment(EquipmentItemsFixtures.basicShield, 2, true);
+            let result = await inventory.toggleEquip(equippedSword);
+            assert.deepStrictEqual([result, equippedSword.equipped, equippedShield.equipped], [true, false, true]);
+        });
+
+        it('should equip the item when no item of its group is equipped', async () => {
+            let equippedShield = await addGroupEquipment(EquipmentItemsFixtures.basicShield, 2, true);
+            let sword = await addGroupEquipment(EquipmentItemsFixtures.basicSword, 1, false);
+            let result = await inventory.toggleEquip(sword);
+            assert.deepStrictEqual([result, sword.equipped, equippedShield.equipped], [true, true, true]);
+        });
+
+        it('should unequip an item toggled during its growth level up after the level up', async () => {
+            let leveler = new ItemGrowthLeveler();
+            let sword = await TestHelpers.createEquippedGrowingSword(manager, leveler, 1, 0);
+            await inventory.addItem(sword);
+            let growth = leveler.addItemExperience(sword, 20);
+            let result = await inventory.toggleEquip(sword);
+            await growth;
+            assert.deepStrictEqual([result, sword.growthLevel, sword.equipped], [true, 2, false]);
+        });
+    });
+
     describe('modifyItemQty', () => {
         it('should set quantity correctly', async () => {
             let itemData = {...BaseItemsFixtures.basicItem, manager: manager};
