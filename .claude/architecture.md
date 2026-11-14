@@ -111,7 +111,9 @@ Core inventory management with add/remove/modify operations.
 - `validate(item)` - Async validation of item instance
 - `addItem(item)` - Async add item with validation
 - `addItems(itemsArray)` - Async add multiple items
-- `removeItem(key)` - Async remove item by key
+- `removeItem(key)` - Async remove item by key (unequips an equipped item first with `unequipOnRemove`)
+- `toggleEquip(item)` - Async equip toggle after the item pending growth: unequips an equipped item, or unequips the
+  equipped item of the same group (`unEquipPrevious(groupId)`) and equips the item
 - `setItemQty(key, qty)` - Set item quantity
 - `increaseItemQty(key, qty)` - Increase item quantity
 - `decreaseItemQty(key, qty)` - Decrease item quantity
