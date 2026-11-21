@@ -214,6 +214,51 @@ describe('Data Generators', () => {
             });
         });
 
+        describe('appendGroup', () => {
+            it('should replace the edited group model and its mapped data', () => {
+                class CustomGroup extends ItemGroup {}
+                let groups = GroupsDataGenerator.groupsListMappedData({}, [
+                    {id: 1, key: 'weapon', label: 'Weapon'},
+                    {id: 2, key: 'shield', label: 'Shield'}
+                ]);
+                let editedModel = {id: 1, key: 'weapon', label: 'Weapons'};
+                let result = GroupsDataGenerator.appendGroup(editedModel, groups, {weapon: CustomGroup});
+                assert.strictEqual(result, groups);
+                assert.deepStrictEqual(groups.groupModels.map(group => [group.id, group.label]), [[2, 'Shield'], [1, 'Weapons']]);
+                assert.deepStrictEqual(
+                    [groups.groupList.weapon.class, groups.groupList.weapon.data, groups.groupBaseData.weapon.label],
+                    [CustomGroup, editedModel, 'Weapons']
+                );
+                assert.deepStrictEqual(Object.keys(groups.groupList).sort(), ['shield', 'weapon']);
+            });
+
+            it('should remove the previous key entries of a group with an edited key', () => {
+                let groups = GroupsDataGenerator.groupsListMappedData({}, [{id: 1, key: 'weapon', label: 'Weapon'}]);
+                GroupsDataGenerator.appendGroup({id: 1, key: 'weapons', label: 'Weapons'}, groups, {});
+                assert.deepStrictEqual(
+                    [Object.keys(groups.groupList), Object.keys(groups.groupBaseData), groups.groupModels.length],
+                    [['weapons'], ['weapons'], 1]
+                );
+            });
+
+            it('should add a new group to empty groups data and ignore missing arguments', () => {
+                let groups = {};
+                GroupsDataGenerator.appendGroup({id: 3, key: 'ring', label: 'Ring'}, groups, {});
+                assert.deepStrictEqual(
+                    [groups.groupModels.length, groups.groupList.ring.class, groups.groupBaseData.ring.label],
+                    [1, ItemGroup, 'Ring']
+                );
+                assert.deepStrictEqual(
+                    [
+                        GroupsDataGenerator.appendGroup(false, groups, {}),
+                        GroupsDataGenerator.appendGroup({id: 4}, false, {}),
+                        GroupsDataGenerator.appendGroup({id: 4}, groups, false)
+                    ],
+                    [false, false, false]
+                );
+            });
+        });
+
         describe('addGroup', () => {
             it('should add group to collections', () => {
                 let groups = {groupList: {}, groupBaseData: {}};
