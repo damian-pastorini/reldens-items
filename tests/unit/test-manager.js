@@ -8,7 +8,10 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const ItemsManager = require('../../lib/manager');
 const ItemBase = require('../../lib/item/type/item-base');
+const SingleUsable = require('../../lib/item/type/single-usable');
+const SingleEquipment = require('../../lib/item/type/single-equipment');
 const ItemsEvents = require('../../lib/items-events');
+const ItemsConst = require('../../lib/constants');
 const { TestHelpers } = require('../utils/test-helpers');
 const { BaseItemsFixtures } = require('../fixtures/items/base-items');
 const { MockOwner } = require('../fixtures/mocks/mock-owner');
@@ -188,19 +191,43 @@ describe('ItemsManager', () => {
         it('should create single instance item with quantity', () => {
             let itemsModelData = {
                 'test-item': {
-                    class: class extends ItemBase {
-                        static isSingleInstance() { return true; }
-                        constructor(props) {
-                            super(props);
-                            this.singleInstance = true;
-                        }
-                    },
-                    data: {...BaseItemsFixtures.basicItem}
+                    class: ItemBase,
+                    data: {...BaseItemsFixtures.basicItem, type: ItemsConst.TYPES.SINGLE}
                 }
             };
             manager = new ItemsManager({owner: mockOwner, itemsModelData: itemsModelData});
             let item = manager.createItemInstance('test-item', 5);
             assert.strictEqual(item.qty, 5);
+        });
+
+        it('should keep the requested quantity of the single usable and single equipment items', () => {
+            let itemsModelData = {
+                'test-potion': {
+                    class: SingleUsable,
+                    data: {...BaseItemsFixtures.basicItem, key: 'test-potion', type: ItemsConst.TYPES.SINGLE_USABLE}
+                },
+                'test-ring': {
+                    class: SingleEquipment,
+                    data: {...BaseItemsFixtures.basicItem, key: 'test-ring', type: ItemsConst.TYPES.SINGLE_EQUIPMENT}
+                }
+            };
+            manager = new ItemsManager({owner: mockOwner, itemsModelData: itemsModelData});
+            let potion = manager.createItemInstance('test-potion', 4);
+            let ring = manager.createItemInstance('test-ring', 2);
+            assert.deepStrictEqual(
+                [potion instanceof SingleUsable, potion.qty, ring instanceof SingleEquipment, ring.qty],
+                [true, 4, true, 2]
+            );
+        });
+
+        it('should create one instance per unit of a quantity of an item that is not single instance', () => {
+            let itemsModelData = {'test-item': {class: ItemBase, data: {...BaseItemsFixtures.basicItem}}};
+            manager = new ItemsManager({owner: mockOwner, itemsModelData: itemsModelData});
+            let items = manager.createItemInstance('test-item', 3);
+            assert.deepStrictEqual(
+                [Array.isArray(items), items.length, items.map(item => [item instanceof ItemBase, item.qty])],
+                [true, 3, [[true, 1], [true, 1], [true, 1]]]
+            );
         });
 
         it('should create single instance when quantity is 1', () => {
