@@ -102,4 +102,20 @@ describe('Sender', () => {
             assert.deepStrictEqual(messagesClient.sentMessages, []);
         });
     });
+
+    describe('target props', () => {
+        it('should read the broadcast target properties for the broadcast and both behaviors', () => {
+            itemsServer.client.sendTargetProps = {broadcast: ['sessionId'], send: []};
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: itemsServer.manager});
+            item.target = {sessionId: 'session-7'};
+            assert.deepStrictEqual(
+                [
+                    itemsServer.client.getTargetProps(item, ItemsConst.BEHAVIOR_BROADCAST),
+                    itemsServer.client.getTargetProps(item, ItemsConst.BEHAVIOR_BOTH),
+                    itemsServer.client.getTargetProps(item, ItemsConst.BEHAVIOR_SEND)
+                ],
+                [{sessionId: 'session-7'}, {sessionId: 'session-7'}, {}]
+            );
+        });
+    });
 });
