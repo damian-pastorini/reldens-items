@@ -41,6 +41,14 @@ describe('SingleUsable', () => {
         });
     });
 
+    describe('isSingleInstance', () => {
+        it('should always return true, even with the singleInstance property changed', () => {
+            let item = new SingleUsable({...UsableItemsFixtures.singleUsable, manager: manager});
+            item.singleInstance = false;
+            assert.deepStrictEqual([item.isSingleInstance(), item.getInventoryId()], [true, item.key]);
+        });
+    });
+
     describe('Use functionality', () => {
         it('should be able to use the item', async () => {
             let itemData = {...UsableItemsFixtures.singleUsable, manager: manager};

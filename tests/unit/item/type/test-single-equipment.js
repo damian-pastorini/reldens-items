@@ -41,6 +41,14 @@ describe('SingleEquipment', () => {
         });
     });
 
+    describe('isSingleInstance', () => {
+        it('should always return true, even with the singleInstance property changed', () => {
+            let item = new SingleEquipment({...EquipmentItemsFixtures.singleEquipment, manager: manager});
+            item.singleInstance = false;
+            assert.deepStrictEqual([item.isSingleInstance(), item.getInventoryId()], [true, item.key]);
+        });
+    });
+
     describe('Equip functionality', () => {
         it('should be able to equip and unequip', async () => {
             let itemData = {...EquipmentItemsFixtures.singleEquipment, manager: manager};

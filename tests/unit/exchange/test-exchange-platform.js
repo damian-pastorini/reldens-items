@@ -10,6 +10,7 @@ const ExchangePlatform = require('../../../lib/exchange/exchange-platform');
 const RequirementsCollection = require('../../../lib/exchange/requirements-collection');
 const RewardsCollection = require('../../../lib/exchange/rewards-collection');
 const ItemBase = require('../../../lib/item/type/item-base');
+const ItemSingle = require('../../../lib/item/type/single');
 const ItemsManager = require('../../../lib/manager');
 const ItemsConst = require('../../../lib/constants');
 const { TestHelpers } = require('../../utils/test-helpers');
@@ -266,6 +267,21 @@ describe('ExchangePlatform', () => {
             await platform.confirmExchange('A');
             let result = await platform.finalizeExchange();
             assert.strictEqual(result, false);
+        });
+
+        it('should move the offer once when the confirmed exchange is finalized twice in the same tick', async () => {
+            let itemKey = BaseItemsFixtures.basicItem.key;
+            await inventoryA.addItem(new ItemSingle({...BaseItemsFixtures.basicItem, qty: 2, manager: managerA}));
+            managerB.itemsModelData = {[itemKey]: {class: ItemSingle, data: {...BaseItemsFixtures.basicItem}}};
+            platform.initializeExchangeBetween({inventoryA, inventoryB});
+            await platform.pushForExchange(itemKey, 1, 'A');
+            await platform.confirmExchange('A');
+            await platform.confirmExchange('B');
+            let results = await Promise.all([platform.finalizeExchange(), platform.finalizeExchange()]);
+            assert.deepStrictEqual(
+                [results[0] !== false, results[1], inventoryA.items[itemKey].qty, inventoryB.items[itemKey].qty],
+                [true, false, 1, 1]
+            );
         });
     });
 

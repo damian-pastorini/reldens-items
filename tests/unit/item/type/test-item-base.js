@@ -190,8 +190,11 @@ describe('ItemBase', () => {
     });
 
     describe('isSingleInstance', () => {
-        it('should return false for ItemBase', () => {
-            assert.strictEqual(ItemBase.isSingleInstance(), false);
+        it('should return the ItemBase singleInstance property, false by default and true once set', () => {
+            let item = new ItemBase({...BaseItemsFixtures.basicItem, manager: manager});
+            let defaultValue = item.isSingleInstance();
+            item.singleInstance = true;
+            assert.deepStrictEqual([defaultValue, item.isSingleInstance()], [false, true]);
         });
     });
 

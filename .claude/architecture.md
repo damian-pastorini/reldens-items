@@ -236,7 +236,8 @@ Base class for all item types. Contains core properties and modifier handling.
 - Custom properties from customData
 
 **Key Methods:**
-- `static isSingleInstance()` - Returns false (overridden in Single types)
+- `isSingleInstance()` - Returns the `singleInstance` property (overridden to always return true in the Single types);
+  every check reads it through this method, the manager decides how many instances to create from the item data type
 - `getInventoryId()` - Returns key (single) or uid (unique)
 - `applyModifiers()` - Async apply all modifiers to target
 - `revertModifiers()` - Async revert all modifiers from target
@@ -260,7 +261,7 @@ Base class for all item types. Contains core properties and modifier handling.
 Single-instance items where quantity is grouped in one inventory slot.
 
 **Key Differences:**
-- `static isSingleInstance()` - Returns true
+- `isSingleInstance()` - Always returns true (also on SingleEquipment and SingleUsable), whatever the property value
 - `singleInstance` property set to true in constructor
 - Uses `key` as inventory ID instead of `uid`
 - Multiple items with same key share one inventory slot

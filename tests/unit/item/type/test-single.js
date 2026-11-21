@@ -41,8 +41,10 @@ describe('ItemSingle', () => {
     });
 
     describe('isSingleInstance', () => {
-        it('should return true', () => {
-            assert.strictEqual(ItemSingle.isSingleInstance(), true);
+        it('should always return true, even with the singleInstance property changed', () => {
+            let item = new ItemSingle({...SingleItemsFixtures.stackableItem, manager: manager});
+            item.singleInstance = false;
+            assert.deepStrictEqual([item.isSingleInstance(), item.getInventoryId()], [true, item.key]);
         });
     });
 

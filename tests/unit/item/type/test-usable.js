@@ -68,17 +68,51 @@ describe('Usable', () => {
             await item.use(mockOwner);
             assert.strictEqual(item.target, mockOwner);
         });
-    });
 
-    describe('executeItem', () => {
         it('should decrease currentUses', async () => {
             let itemData = {...UsableItemsFixtures.simpleUsable, manager: manager, uses: 3};
             let item = new Usable(itemData);
-            item.target = mockOwner;
             item.removeAfterUse = false;
-            await item.executeItem();
+            await item.use(mockOwner);
             assert.strictEqual(item.currentUses, 2);
         });
+
+        it('should keep the use and exec time outs of the item props and run at once without exec time out', async () => {
+            let applyCalled = 0;
+            let mockModifiers = {mod1: {apply: () => { applyCalled++; }}};
+            let timedItem = new Usable({
+                ...UsableItemsFixtures.healthPotion,
+                manager: manager,
+                useTimeOut: 5000,
+                execTimeOut: 4000
+            });
+            let nullTimeOutItem = new Usable({
+                ...UsableItemsFixtures.healthPotion,
+                manager: manager,
+                modifiers: mockModifiers,
+                useTimeOut: null,
+                execTimeOut: null
+            });
+            nullTimeOutItem.removeAfterUse = false;
+            await nullTimeOutItem.use(mockOwner);
+            assert.deepStrictEqual(
+                [timedItem.useTimeOut, timedItem.execTimeOut, applyCalled, nullTimeOutItem.canUse],
+                [5000, 4000, 1, true]
+            );
+        });
+
+        it('should apply the modifiers once for two uses of the last use started in the same tick', async () => {
+            let applyCalled = 0;
+            let mockModifiers = {mod1: {apply: () => { applyCalled++; }}};
+            let itemData = {...UsableItemsFixtures.healthPotion, manager: manager, modifiers: mockModifiers};
+            let item = new Usable(itemData);
+            item.removeAfterUse = false;
+            let results = await Promise.all([item.use(mockOwner), item.use(mockOwner)]);
+            assert.deepStrictEqual([applyCalled, item.currentUses, results], [1, 0, [undefined, false]]);
+        });
+    });
+
+    describe('executeItem', () => {
 
         it('should apply modifiers', async () => {
             let applyCalled = 0;
